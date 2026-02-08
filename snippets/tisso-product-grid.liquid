@@ -1,0 +1,137 @@
+{% comment %}
+Custom Product Grid + Popup
+Vanilla JS only
+{% endcomment %}
+
+<section class="tisso-grid">
+  <h2>Tisso vision in the wild</h2>
+
+  <div class="grid">
+    {% for block in section.blocks %}
+      {% assign product = block.settings.product %}
+      {% if product %}
+        <div class="grid-item">
+          <img src="{{ product.featured_image | image_url: width: 600 }}">
+          <button class="dot" data-product='{{ product | json }}'>+</button>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</section>
+
+<div class="popup-overlay" id="popup">
+  <div class="popup">
+    <button class="close">×</button>
+    <h3 id="title"></h3>
+    <p id="price"></p>
+    <p id="desc"></p>
+    <div id="variants"></div>
+    <button id="add">ADD TO CART →</button>
+  </div>
+</div>
+
+<style>
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.grid-item {
+  position: relative;
+}
+.dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}
+.popup-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  justify-content: center;
+  align-items: center;
+}
+.popup {
+  background: white;
+  padding: 30px;
+  max-width: 400px;
+}
+@media(max-width:768px){
+  .grid{ grid-template-columns:1fr 1fr; }
+}
+</style>
+
+<script>
+const SOFT_WINTER_JACKET_VARIANT_ID = 51379091996993; //  Variant ID of our soft winter jacket 
+
+let selectedVariant = null;
+let selectedOptions = {};
+
+document.querySelectorAll('.dot').forEach(btn => {
+  btn.onclick = () => {
+    const p = JSON.parse(btn.dataset.product);
+    title.textContent = p.title;
+    price.textContent = `$${(p.price/100).toFixed(2)}`;
+    desc.textContent = p.description.replace(/<[^>]*>/g,'');
+    variants.innerHTML = '';
+    selectedOptions = {};
+
+    p.options.forEach((opt,i)=>{
+      const select = document.createElement('select');
+      opt.values.forEach(v=>{
+        select.innerHTML += `<option>${v}</option>`;
+      });
+      select.onchange = ()=>{
+        selectedOptions[i] = select.value;
+        const v = p.variants.find(x =>
+          x.options.every((o,idx)=>o===selectedOptions[idx])
+        );
+        if(v) selectedVariant = v.id;
+      };
+      variants.appendChild(select);
+    });
+
+    selectedVariant = p.variants[0].id;
+    popup.style.display='flex';
+  };
+});
+
+document.querySelector('.close').onclick=()=>popup.style.display='none';
+
+add.onclick = async ()=>{
+  await fetch('/cart/add.js',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({id:selectedVariant,quantity:1})
+  });
+
+  if(Object.values(selectedOptions).includes('Black') &&
+     Object.values(selectedOptions).includes('Medium')){
+    await fetch('/cart/add.js',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({id:SOFT_WINTER_JACKET_VARIANT_ID,quantity:1})
+    });
+  }
+
+  popup.style.display='none';
+};
+</script>
+
+{% schema %}
+{
+  "name": "Tisso Product Grid",
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product",
+      "settings": [
+        { "type": "product", "id": "product", "label": "Select product" }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [{ "name": "Tisso Product Grid" }]
+}
+{% endschema %}
