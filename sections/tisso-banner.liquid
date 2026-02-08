@@ -1,68 +1,750 @@
-<section class="tisso-banner">
-
-  <div class="frame frame-one"></div>
-  <div class="frame frame-two"></div>
-
-  <div class="content-card">
-    <h1>{{ section.settings.heading }}</h1>
-    <p>{{ section.settings.description }}</p>
-
-    <a href="{{ section.settings.button_link }}" class="card-btn">
-      {{ section.settings.button_text }} →
-    </a>
-  </div>
-
-</section>
+{% comment %}
+  Tisso Banner Frames Section
+{% endcomment %}
 
 <style>
-.tisso-banner {
-  position: relative;
-  padding: 100px 20px;
-}
+  .tisso-banner-container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: {{ section.settings.section_padding }}px 20px;
+    background-color: {{ section.settings.background_color }};
+  }
 
-.frame {
-  position: absolute;
-  inset: 0;
-  background-image: url({{ section.settings.background | image_url }});
-  background-size: cover;
-}
+  .tisso-frames-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: {{ section.settings.frame_gap }}px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
 
-.frame-two {
-  transform: translateY(40px);
-  opacity: 0.8;
-}
+  /* Frame 1 - Red border (spans full width at top) */
+  .tisso-frame-1 {
+    grid-column: 1 / -1;
+    border: {{ section.settings.frame1_border_width }}px solid {{ section.settings.frame1_border_color }};
+    border-radius: {{ section.settings.frame_border_radius }}px;
+    padding: {{ section.settings.frame_padding }}px;
+    background-color: {{ section.settings.frame1_bg_color }};
+    overflow: hidden;
+    position: relative;
+  }
 
-.content-card {
-  position: relative;
-  background: white;
-  max-width: 420px;
-  padding: 40px;
-}
+  /* Frame 3 - Yellow border (bottom left - Gift Guide) */
+  .tisso-frame-3 {
+    grid-column: 1;
+    border: {{ section.settings.frame3_border_width }}px solid {{ section.settings.frame3_border_color }};
+    border-radius: {{ section.settings.frame_border_radius }}px;
+    padding: {{ section.settings.frame_padding }}px;
+    background-color: {{ section.settings.frame3_bg_color }};
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 300px;
+  }
 
-.card-btn {
-  background: black;
-  color: white;
-  padding: 12px 20px;
-  display: inline-block;
-  transition: background 0.3s;
-}
+  /* Frame 2 - Blue border (bottom right - Product details) */
+  .tisso-frame-2 {
+    grid-column: 2;
+    border: {{ section.settings.frame2_border_width }}px solid {{ section.settings.frame2_border_color }};
+    border-radius: {{ section.settings.frame_border_radius }}px;
+    padding: {{ section.settings.frame_padding }}px;
+    background-color: {{ section.settings.frame2_bg_color }};
+    overflow: hidden;
+    position: relative;
+  }
 
-.card-btn:hover {
-  background: #ffd400;
-  color: black;
-}
+  /* Frame content styling */
+  .frame-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+  }
+
+  .frame-3-content {
+    z-index: 2;
+    position: relative;
+  }
+
+  .frame-3-title {
+    font-size: {{ section.settings.frame3_title_size }}px;
+    font-weight: {{ section.settings.frame3_title_weight }};
+    color: {{ section.settings.frame3_title_color }};
+    margin-bottom: 15px;
+    line-height: 1.2;
+  }
+
+  .frame-3-description {
+    font-size: {{ section.settings.frame3_desc_size }}px;
+    color: {{ section.settings.frame3_desc_color }};
+    margin-bottom: 25px;
+    line-height: {{ section.settings.frame3_desc_line_height }};
+    max-width: 90%;
+  }
+
+  .frame-3-description p {
+    margin: 0;
+  }
+
+  /* Button styling with hover animation */
+  .tisso-cta-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: {{ section.settings.button_padding_v }}px {{ section.settings.button_padding_h }}px;
+    background-color: {{ section.settings.button_bg_color }};
+    color: {{ section.settings.button_text_color }};
+    text-decoration: none;
+    font-size: {{ section.settings.button_font_size }}px;
+    font-weight: {{ section.settings.button_font_weight }};
+    border-radius: {{ section.settings.button_border_radius }}px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .tisso-cta-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background-color: {{ section.settings.button_hover_bg_color }};
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease;
+    z-index: -1;
+  }
+
+  .tisso-cta-button:hover {
+    color: {{ section.settings.button_hover_text_color }};
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .tisso-cta-button:hover::before {
+    width: 300px;
+    height: 300px;
+  }
+
+  .button-arrow {
+    transition: transform 0.3s ease;
+    font-size: 16px;
+  }
+
+  .tisso-cta-button:hover .button-arrow {
+    transform: translateX(5px);
+  }
+
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .tisso-frames-wrapper {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto;
+    }
+
+    .tisso-frame-1 {
+      grid-column: 1;
+    }
+
+    .tisso-frame-2,
+    .tisso-frame-3 {
+      grid-column: 1;
+    }
+
+    .frame-3-description {
+      max-width: 100%;
+    }
+
+    .bottom-text {
+      font-size: 10px !important;
+    }
+  }
+
+  /* Bottom Text Banner */
+  .tisso-bottom-text-banner {
+    text-align: center;
+    padding: {{ section.settings.bottom_text_padding }}px 20px;
+    background-color: {{ section.settings.bottom_text_bg_color }};
+    margin-top: 20px;
+  }
+
+  .bottom-text {
+    font-size: {{ section.settings.bottom_text_size }}px;
+    color: {{ section.settings.bottom_text_color }};
+    margin: 0;
+    letter-spacing: 0.5px;
+    text-transform: {{ section.settings.bottom_text_transform }};
+  }
+
+  /* Animation classes for JavaScript */
+  .tisso-animate-fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .tisso-animate-fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
 </style>
+
+<div class="tisso-banner-container" id="tisso-banner-{{ section.id }}">
+  <div class="tisso-frames-wrapper">
+    
+    {% comment %} Frame 1 - Red Border (Top) {% endcomment %}
+    <div class="tisso-frame-1 tisso-animate-fade-in" data-animation-delay="0">
+      {% if section.settings.frame1_image %}
+        <img 
+          src="{{ section.settings.frame1_image | img_url: 'master' }}" 
+          alt="{{ section.settings.frame1_image_alt }}"
+          class="frame-image"
+          loading="lazy"
+        >
+      {% else %}
+        <div style="background: #f0f0f0; height: 300px; display: flex; align-items: center; justify-content: center; color: #999;">
+          Frame 1 - Product Flatlay Image
+        </div>
+      {% endif %}
+    </div>
+
+    {% comment %} Frame 3 - Yellow Border (Bottom Left - Gift Guide) {% endcomment %}
+    <div class="tisso-frame-3 tisso-animate-fade-in" data-animation-delay="200">
+      <div class="frame-3-content">
+        {% if section.settings.frame3_title != blank %}
+          <h2 class="frame-3-title">{{ section.settings.frame3_title }}</h2>
+        {% endif %}
+        
+        {% if section.settings.frame3_description != blank %}
+          <p class="frame-3-description">{{ section.settings.frame3_description }}</p>
+        {% endif %}
+        
+        {% if section.settings.frame3_button_text != blank %}
+          <a href="{{ section.settings.frame3_button_link }}" class="tisso-cta-button">
+            {{ section.settings.frame3_button_text }}
+            <span class="button-arrow">→</span>
+          </a>
+        {% endif %}
+      </div>
+    </div>
+
+    {% comment %} Frame 2 - Blue Border (Bottom Right) {% endcomment %}
+    <div class="tisso-frame-2 tisso-animate-fade-in" data-animation-delay="400">
+      {% if section.settings.frame2_image %}
+        <img 
+          src="{{ section.settings.frame2_image | img_url: 'master' }}" 
+          alt="{{ section.settings.frame2_image_alt }}"
+          class="frame-image"
+          loading="lazy"
+        >
+      {% else %}
+        <div style="background: #f0f0f0; height: 300px; display: flex; align-items: center; justify-content: center; color: #999;">
+          Frame 2 - Product Details Image
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+{% comment %} Bottom Editable Text Banner {% endcomment %}
+{% if section.settings.bottom_text != blank %}
+<div class="tisso-bottom-text-banner">
+  <p class="bottom-text">{{ section.settings.bottom_text }}</p>
+</div>
+{% endif %}
+
+<script>
+  /**
+   * Tisso Banner Animation Controller
+   * Handles intersection observer for fade-in animations
+   * Pure Vanilla JavaScript - No jQuery
+   */
+  (function() {
+    'use strict';
+
+    // Wait for DOM to be fully loaded
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initTissoBanner);
+    } else {
+      initTissoBanner();
+    }
+
+    function initTissoBanner() {
+      const bannerId = 'tisso-banner-{{ section.id }}';
+      const bannerContainer = document.getElementById(bannerId);
+      
+      if (!bannerContainer) {
+        console.warn('Tisso Banner container not found');
+        return;
+      }
+
+      // Get all animated elements
+      const animatedElements = bannerContainer.querySelectorAll('.tisso-animate-fade-in');
+
+      // Intersection Observer options
+      const observerOptions = {
+        root: null, // viewport
+        rootMargin: '0px 0px -100px 0px', // Trigger slightly before element enters viewport
+        threshold: 0.1 // Trigger when 10% of element is visible
+      };
+
+      // Callback function when element intersects
+      const handleIntersection = function(entries, observer) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            // Get animation delay from data attribute
+            const delay = parseInt(entry.target.getAttribute('data-animation-delay')) || 0;
+            
+            // Add visible class after delay
+            setTimeout(function() {
+              entry.target.classList.add('visible');
+            }, delay);
+
+            // Stop observing this element
+            observer.unobserve(entry.target);
+          }
+        });
+      };
+
+      // Create intersection observer
+      const observer = new IntersectionObserver(handleIntersection, observerOptions);
+
+      // Observe all animated elements
+      animatedElements.forEach(function(element) {
+        observer.observe(element);
+      });
+
+      // Button ripple effect on click
+      const ctaButton = bannerContainer.querySelector('.tisso-cta-button');
+      if (ctaButton) {
+        ctaButton.addEventListener('click', function(e) {
+          // Create ripple element
+          const ripple = document.createElement('span');
+          ripple.style.position = 'absolute';
+          ripple.style.borderRadius = '50%';
+          ripple.style.background = 'rgba(255, 255, 255, 0.6)';
+          ripple.style.width = '20px';
+          ripple.style.height = '20px';
+          ripple.style.pointerEvents = 'none';
+          
+          // Position ripple at click location
+          const rect = this.getBoundingClientRect();
+          const x = e.clientX - rect.left - 10;
+          const y = e.clientY - rect.top - 10;
+          
+          ripple.style.left = x + 'px';
+          ripple.style.top = y + 'px';
+          ripple.style.transform = 'scale(0)';
+          ripple.style.opacity = '1';
+          ripple.style.transition = 'transform 0.6s ease, opacity 0.6s ease';
+          
+          this.appendChild(ripple);
+          
+          // Animate ripple
+          setTimeout(function() {
+            ripple.style.transform = 'scale(10)';
+            ripple.style.opacity = '0';
+          }, 10);
+          
+          // Remove ripple after animation
+          setTimeout(function() {
+            ripple.remove();
+          }, 600);
+        });
+      }
+    }
+  })();
+</script>
 
 {% schema %}
 {
-  "name": "Tisso Banner",
+  "name": "Tisso Banner Frames",
   "settings": [
-    { "type": "image_picker", "id": "background", "label": "Background image" },
-    { "type": "text", "id": "heading", "label": "Heading", "default": "The Gift Guide" },
-    { "type": "textarea", "id": "description", "label": "Description" },
-    { "type": "text", "id": "button_text", "label": "Button text", "default": "SHOP NOW" },
-    { "type": "url", "id": "button_link", "label": "Button link" }
+    {
+      "type": "header",
+      "content": "Section Settings"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Section Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "section_padding",
+      "label": "Section Padding",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "frame_gap",
+      "label": "Gap Between Frames",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "frame_padding",
+      "label": "Frame Inner Padding",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "frame_border_radius",
+      "label": "Frame Border Radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Frame 1 - Red Border (Top)"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame1_image",
+      "label": "Frame 1 Image"
+    },
+    {
+      "type": "text",
+      "id": "frame1_image_alt",
+      "label": "Frame 1 Image Alt Text",
+      "default": "Product flatlay"
+    },
+    {
+      "type": "color",
+      "id": "frame1_border_color",
+      "label": "Frame 1 Border Color",
+      "default": "#E74C3C"
+    },
+    {
+      "type": "range",
+      "id": "frame1_border_width",
+      "label": "Frame 1 Border Width",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "default": 3
+    },
+    {
+      "type": "color",
+      "id": "frame1_bg_color",
+      "label": "Frame 1 Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Frame 2 - Blue Border (Bottom Right)"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame2_image",
+      "label": "Frame 2 Image"
+    },
+    {
+      "type": "text",
+      "id": "frame2_image_alt",
+      "label": "Frame 2 Image Alt Text",
+      "default": "Product details"
+    },
+    {
+      "type": "color",
+      "id": "frame2_border_color",
+      "label": "Frame 2 Border Color",
+      "default": "#3498DB"
+    },
+    {
+      "type": "range",
+      "id": "frame2_border_width",
+      "label": "Frame 2 Border Width",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "default": 3
+    },
+    {
+      "type": "color",
+      "id": "frame2_bg_color",
+      "label": "Frame 2 Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Frame 3 - Gift Guide Section (Bottom Left)"
+    },
+    {
+      "type": "color",
+      "id": "frame3_border_color",
+      "label": "Frame 3 Border Color (Red Rectangle)",
+      "default": "#E74C3C",
+      "info": "This is the red border around the Gift Guide section"
+    },
+    {
+      "type": "range",
+      "id": "frame3_border_width",
+      "label": "Frame 3 Border Width",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "default": 3
+    },
+    {
+      "type": "color",
+      "id": "frame3_bg_color",
+      "label": "Frame 3 Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "📝 Gift Guide Title (Editable)"
+    },
+    {
+      "type": "text",
+      "id": "frame3_title",
+      "label": "Title Text",
+      "default": "The Gift Guide",
+      "info": "Main heading text - fully editable"
+    },
+    {
+      "type": "range",
+      "id": "frame3_title_size",
+      "label": "Title Font Size",
+      "min": 20,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "select",
+      "id": "frame3_title_weight",
+      "label": "Title Font Weight",
+      "options": [
+        {"value": "400", "label": "Normal"},
+        {"value": "600", "label": "Semi Bold"},
+        {"value": "700", "label": "Bold"}
+      ],
+      "default": "700"
+    },
+    {
+      "type": "color",
+      "id": "frame3_title_color",
+      "label": "Title Color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "📝 Gift Guide Description (Editable)"
+    },
+    {
+      "type": "richtext",
+      "id": "frame3_description",
+      "label": "Description Text",
+      "default": "<p>Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season.</p>",
+      "info": "Full description text - fully editable"
+    },
+    {
+      "type": "range",
+      "id": "frame3_desc_size",
+      "label": "Description Font Size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "frame3_desc_color",
+      "label": "Description Color",
+      "default": "#666666"
+    },
+    {
+      "type": "range",
+      "id": "frame3_desc_line_height",
+      "label": "Description Line Height",
+      "min": 1.2,
+      "max": 2.0,
+      "step": 0.1,
+      "default": 1.6
+    },
+    {
+      "type": "header",
+      "content": "🔘 Button Settings (Editable)"
+    },
+    {
+      "type": "text",
+      "id": "frame3_button_text",
+      "label": "Button Text",
+      "default": "SHOP NOW",
+      "info": "Button text - fully editable"
+    },
+    {
+      "type": "url",
+      "id": "frame3_button_link",
+      "label": "Button Link URL",
+      "info": "Where the button should navigate to"
+    },
+    {
+      "type": "color",
+      "id": "button_bg_color",
+      "label": "Button Background Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_bg_color",
+      "label": "Button Hover Background Color",
+      "default": "#F39C12"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_text_color",
+      "label": "Button Hover Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "button_font_size",
+      "label": "Button Font Size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "select",
+      "id": "button_font_weight",
+      "label": "Button Font Weight",
+      "options": [
+        {"value": "400", "label": "Normal"},
+        {"value": "600", "label": "Semi Bold"},
+        {"value": "700", "label": "Bold"}
+      ],
+      "default": "700"
+    },
+    {
+      "type": "range",
+      "id": "button_padding_v",
+      "label": "Button Vertical Padding",
+      "min": 8,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "button_padding_h",
+      "label": "Button Horizontal Padding",
+      "min": 15,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "label": "Button Border Radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "📝 Bottom Text Banner (Editable)"
+    },
+    {
+      "type": "text",
+      "id": "bottom_text",
+      "label": "Bottom Text",
+      "default": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6X",
+      "info": "Text displayed at the bottom of the banner"
+    },
+    {
+      "type": "range",
+      "id": "bottom_text_size",
+      "label": "Bottom Text Font Size",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "color",
+      "id": "bottom_text_color",
+      "label": "Bottom Text Color",
+      "default": "#666666"
+    },
+    {
+      "type": "color",
+      "id": "bottom_text_bg_color",
+      "label": "Bottom Text Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "bottom_text_padding",
+      "label": "Bottom Text Padding",
+      "min": 5,
+      "max": 40,
+      "step": 5,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "select",
+      "id": "bottom_text_transform",
+      "label": "Bottom Text Transform",
+      "options": [
+        {"value": "none", "label": "None"},
+        {"value": "uppercase", "label": "Uppercase"},
+        {"value": "lowercase", "label": "Lowercase"},
+        {"value": "capitalize", "label": "Capitalize"}
+      ],
+      "default": "uppercase"
+    }
   ],
-  "presets": [{ "name": "Tisso Banner" }]
+  "presets": [
+    {
+      "name": "Tisso Banner Frames",
+      "category": "Custom"
+    }
+  ]
 }
 {% endschema %}
