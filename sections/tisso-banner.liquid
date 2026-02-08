@@ -1,83 +1,55 @@
-{% comment %}
-Custom Banner Section
-Built from scratch (no Dawn components)
-{% endcomment %}
-
 <section class="tisso-banner">
-  <div class="banner-content">
 
-    <span class="brand">{{ section.settings.brand_text }}</span>
+  <div class="frame frame-one"></div>
+  <div class="frame frame-two"></div>
 
-    <p class="helper-text">{{ section.settings.helper_text }}</p>
+  <div class="content-card">
+    <h1>{{ section.settings.heading }}</h1>
+    <p>{{ section.settings.description }}</p>
 
-    <h1 class="heading">{{ section.settings.heading }}</h1>
-
-    <p class="description">{{ section.settings.subheading }}</p>
-
-    <a href="{{ section.settings.button_link }}" class="cta-btn">
-      {{ section.settings.button_text }}
-      <span class="arrow">→</span>
+    <a href="{{ section.settings.button_link }}" class="card-btn">
+      {{ section.settings.button_text }} →
     </a>
-
-    <p class="footer-note">{{ section.settings.footer_note }}</p>
-
   </div>
+
 </section>
 
 <style>
 .tisso-banner {
-  padding: 80px 20px;
-  background-image: url({{ section.settings.background_image | image_url }});
+  position: relative;
+  padding: 100px 20px;
+}
+
+.frame {
+  position: absolute;
+  inset: 0;
+  background-image: url({{ section.settings.background | image_url }});
   background-size: cover;
-  background-position: center;
 }
 
-.banner-content {
-  max-width: 900px;
+.frame-two {
+  transform: translateY(40px);
+  opacity: 0.8;
 }
 
-.brand {
-  font-weight: bold;
-  letter-spacing: 1px;
+.content-card {
+  position: relative;
+  background: white;
+  max-width: 420px;
+  padding: 40px;
 }
 
-.helper-text {
-  margin: 12px 0;
-}
-
-.heading {
-  font-size: 56px;
-}
-
-.description {
-  max-width: 520px;
-  margin: 20px 0;
-}
-
-.cta-btn {
-  display: inline-flex;
-  gap: 10px;
-  padding: 12px 24px;
+.card-btn {
   background: black;
   color: white;
-  text-decoration: none;
-  transition: transform 0.3s ease, gap 0.3s ease;
+  padding: 12px 20px;
+  display: inline-block;
+  transition: background 0.3s;
 }
 
-.cta-btn:hover {
-  transform: translateX(6px);
-  gap: 16px;
-}
-
-.footer-note {
-  margin-top: 40px;
-  font-size: 12px;
-}
-
-@media (max-width: 768px) {
-  .heading {
-    font-size: 36px;
-  }
+.card-btn:hover {
+  background: #ffd400;
+  color: black;
 }
 </style>
 
@@ -85,14 +57,11 @@ Built from scratch (no Dawn components)
 {
   "name": "Tisso Banner",
   "settings": [
-    { "type": "image_picker", "id": "background_image", "label": "Background image" },
-    { "type": "text", "id": "brand_text", "label": "Brand text", "default": "TISSO VISION" },
-    { "type": "text", "id": "helper_text", "label": "Top helper text", "default": "Find the ideal gift for your loved ones." },
+    { "type": "image_picker", "id": "background", "label": "Background image" },
     { "type": "text", "id": "heading", "label": "Heading", "default": "The Gift Guide" },
-    { "type": "textarea", "id": "subheading", "label": "Description" },
+    { "type": "textarea", "id": "description", "label": "Description" },
     { "type": "text", "id": "button_text", "label": "Button text", "default": "SHOP NOW" },
-    { "type": "url", "id": "button_link", "label": "Button link" },
-    { "type": "text", "id": "footer_note", "label": "Bottom note", "default": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6XL" }
+    { "type": "url", "id": "button_link", "label": "Button link" }
   ],
   "presets": [{ "name": "Tisso Banner" }]
 }
