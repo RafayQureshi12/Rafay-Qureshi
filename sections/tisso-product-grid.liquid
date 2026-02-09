@@ -302,7 +302,7 @@ Dynamically renders variants, adds to cart, auto-adds Soft Winter Jacket for Bla
 /* Selected state - fills entire button with black background and white text */
 .tisso-color-option.selected {
   background: #000;
-  color: white;
+  color: #fff;
 }
 
 .tisso-color-option:hover:not(.selected) {
@@ -312,32 +312,23 @@ Dynamically renders variants, adds to cart, auto-adds Soft Winter Jacket for Bla
 /* === ADD TO CART BUTTON === */
 .tisso-popup__add-to-cart {
   width: 100%;
-  padding: 16px 24px;
+  padding: 16px 20px;
   background: #000;
-  color: white;
+  color: #fff;
   border: none;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+  font-size: 14px;
+  font-weight: 400;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background 0.3s ease;
+  letter-spacing: 0.5px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  text-transform: uppercase;
 }
 
-.tisso-popup__add-to-cart:hover:not(:disabled) {
-  background: #FFF544;
-  color: #000;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.tisso-popup__add-to-cart:hover:not(:disabled) .arrow {
-  transform: translateX(4px);
-  color: #000;
+.tisso-popup__add-to-cart:hover {
+  background: #222;
 }
 
 .tisso-popup__add-to-cart:disabled {
@@ -345,59 +336,66 @@ Dynamically renders variants, adds to cart, auto-adds Soft Winter Jacket for Bla
   cursor: not-allowed;
 }
 
-/* === MESSAGES === */
+.tisso-popup__add-to-cart .arrow {
+  font-size: 16px;
+  transition: transform 0.3s ease;
+}
+
+.tisso-popup__add-to-cart:hover .arrow {
+  transform: translateX(4px);
+}
+
+/* === CART MESSAGE === */
 .tisso-popup__message {
   margin-top: 12px;
-  padding: 10px;
-  font-size: 13px;
+  padding: 12px;
   text-align: center;
+  font-size: 13px;
+  border-radius: 4px;
   display: none;
-  border-radius: 3px;
 }
 
 .tisso-popup__message.success {
+  display: block;
   background: #d4edda;
   color: #155724;
-  display: block;
+  border: 1px solid #c3e6cb;
 }
 
 .tisso-popup__message.error {
+  display: block;
   background: #f8d7da;
   color: #721c24;
-  display: block;
+  border: 1px solid #f5c6cb;
 }
 
-/* === MOBILE RESPONSIVE === */
+/* === RESPONSIVE === */
 @media (max-width: 768px) {
   .tisso-grid__container {
     grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-  }
-
-  .tisso-grid__title {
-    font-size: 24px;
-    margin-bottom: 20px;
-  }
-
-  .tisso-popup {
-    max-width: 95%;
+    gap: 12px;
   }
 
   .tisso-popup__content {
     grid-template-columns: 1fr;
   }
 
+  .tisso-popup__left {
+    max-height: 300px;
+  }
+
   .tisso-popup__right {
-    padding: 20px 24px 24px;
+    padding: 24px 20px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tisso-grid__container {
+    grid-template-columns: 1fr;
   }
 
-  .tisso-grid__dot {
-    width: 28px;
-    height: 28px;
-  }
-
-  .tisso-grid__dot::before {
-    font-size: 20px;
+  .tisso-grid__title {
+    font-size: 24px;
   }
 }
 </style>
@@ -406,66 +404,52 @@ Dynamically renders variants, adds to cart, auto-adds Soft Winter Jacket for Bla
 (function() {
   'use strict';
 
-  console.log('Tisso Product Grid Script Loading...');
-
-  // === CONFIGURATION === 
-  const SOFT_WINTER_JACKET_VARIANT_ID = 51379091996993;
   
-  // === STATE ===
-  let currentProductHandle = null;
-  let currentProductData = null;
-  let selectedVariantId = null;
-  let selectedOptions = {};
-
+  // IMPORTANT: Replace this with the actual variant ID of your Soft Winter Jacket
+  const SOFT_WINTER_JACKET_VARIANT_ID = '51380014580033';
+  // To find the variant ID:
+  // 1. Go to your Shopify admin > Products > Soft Winter Jacket
+  // 2. Click on the variant you want to add
+  // 3. Look at the URL - it will be something like: /admin/products/1234567890/variants/9876543210
+  // 4. The number after /variants/ is your variant ID (e.g., 9876543210)
+  // 5. Replace the text above with that number
+  
   // === DOM ELEMENTS ===
   const popup = document.getElementById('tissoPopup');
   const closeBtn = document.getElementById('closePopup');
-  const addToCartBtn = document.getElementById('addToCart');
-  const cartMessage = document.getElementById('cartMessage');
+  const popupImage = document.getElementById('popupImage');
   const popupTitle = document.getElementById('popupTitle');
   const popupPrice = document.getElementById('popupPrice');
   const popupDescription = document.getElementById('popupDescription');
   const popupVariants = document.getElementById('popupVariants');
-  const popupImage = document.getElementById('popupImage');
+  const addToCartBtn = document.getElementById('addToCart');
+  const cartMessage = document.getElementById('cartMessage');
 
-  // === INITIALIZE DOT BUTTONS ===
+  // === STATE ===
+  let currentProductData = null;
+  let currentProductHandle = null;
+  let selectedVariantId = null;
+  let selectedOptions = {};
+
+  // === INITIALIZE BUTTONS ===
   function initButtons() {
-    const dots = document.querySelectorAll('.tisso-grid__dot');
-    console.log('Found ' + dots.length + ' product buttons');
+    const buttons = document.querySelectorAll('.tisso-grid__dot');
     
-    dots.forEach(function(dot) {
-      dot.addEventListener('click', function(e) {
-        e.preventDefault();
+    buttons.forEach(function(button) {
+      button.addEventListener('click', function(e) {
         e.stopPropagation();
+        const productHandle = this.getAttribute('data-product-handle');
         
-        const handle = this.getAttribute('data-product-handle');
-        const title = this.getAttribute('data-product-title');
-        const price = this.getAttribute('data-product-price');
-        const description = this.getAttribute('data-product-description');
-        
-        console.log('Button clicked for product:', handle);
-        
-        if (handle) {
-          loadProductData(handle, {
-            title: title,
-            price: price,
-            description: description
-          });
+        if (productHandle) {
+          loadProductData(productHandle);
         }
       });
     });
   }
 
-  // === LOAD PRODUCT DATA VIA AJAX ===
-  function loadProductData(handle, basicData) {
-    console.log('Loading product data for:', handle);
-    
-    popupTitle.textContent = basicData.title;
-    popupPrice.textContent = formatPrice(basicData.price);
-    popupDescription.textContent = basicData.description;
-    popupVariants.innerHTML = '<p style="color: #999; font-size: 13px;">Loading variants...</p>';
-    
-    openPopup();
+  // === LOAD PRODUCT DATA ===
+  function loadProductData(handle) {
+    console.log('Loading product:', handle);
     
     fetch('/products/' + handle + '.js')
       .then(function(response) {
@@ -476,153 +460,159 @@ Dynamically renders variants, adds to cart, auto-adds Soft Winter Jacket for Bla
         console.log('Product data loaded:', product);
         currentProductData = product;
         currentProductHandle = handle;
-        displayProductDetails(product);
+        renderPopup(product);
+        openPopup();
       })
       .catch(function(error) {
         console.error('Error loading product:', error);
-        showMessage('Error loading product details', 'error');
+        alert('Could not load product details');
       });
   }
 
-  // === DISPLAY PRODUCT DETAILS ===
-  function displayProductDetails(product) {
+  // === RENDER POPUP ===
+  function renderPopup(product) {
+    popupImage.src = product.featured_image;
+    popupImage.alt = product.title;
     popupTitle.textContent = product.title;
     popupPrice.textContent = formatPrice(product.price);
     popupDescription.textContent = stripHtml(product.description);
     
-    if (product.featured_image) {
-      popupImage.src = product.featured_image;
-      popupImage.alt = product.title;
-    }
-    
+    renderVariants(product);
+  }
+
+  // === RENDER VARIANTS ===
+  function renderVariants(product) {
     popupVariants.innerHTML = '';
     selectedOptions = {};
+    selectedVariantId = null;
     
-    if (!product.variants || product.variants.length === 0) {
-      console.log('Product has no variants');
-      selectedVariantId = product.id;
+    if (!product.options || product.options.length === 0) {
+      selectedVariantId = product.variants[0].id;
       return;
     }
     
-    const firstAvailableVariant = product.variants.find(function(v) { return v.available; }) || product.variants[0];
-    selectedVariantId = firstAvailableVariant.id;
-    
-    firstAvailableVariant.options.forEach(function(optionValue, idx) {
-      selectedOptions[idx] = optionValue;
+    product.options.forEach(function(option, index) {
+      const group = document.createElement('div');
+      group.className = 'tisso-variant-group';
+      
+      const label = document.createElement('label');
+      label.className = 'tisso-variant-label';
+      label.textContent = option.name;
+      
+      // Check if this is the Color option
+      if (option.name.toLowerCase() === 'color') {
+        // Create color button container
+        const colorContainer = document.createElement('div');
+        colorContainer.className = 'tisso-color-options';
+        
+        option.values.forEach(function(value, valueIndex) {
+          const colorBtn = document.createElement('button');
+          colorBtn.className = 'tisso-color-option';
+          colorBtn.textContent = value;
+          colorBtn.type = 'button';
+          colorBtn.setAttribute('data-option-index', index);
+          colorBtn.setAttribute('data-option-value', value);
+          
+          // Select first option by default
+          if (valueIndex === 0) {
+            colorBtn.classList.add('selected');
+            selectedOptions[index] = value;
+          }
+          
+          colorBtn.addEventListener('click', function() {
+            // Remove selected from all color buttons in this group
+            colorContainer.querySelectorAll('.tisso-color-option').forEach(function(btn) {
+              btn.classList.remove('selected');
+            });
+            
+            // Add selected to clicked button
+            this.classList.add('selected');
+            
+            // Update selected option
+            const optionIndex = parseInt(this.getAttribute('data-option-index'));
+            const optionValue = this.getAttribute('data-option-value');
+            selectedOptions[optionIndex] = optionValue;
+            
+            console.log('Color selected:', optionValue);
+            updateVariant();
+          });
+          
+          colorContainer.appendChild(colorBtn);
+        });
+        
+        group.appendChild(label);
+        group.appendChild(colorContainer);
+      } else {
+        // Regular dropdown for non-color options
+        const select = document.createElement('select');
+        select.className = 'tisso-variant-select';
+        select.setAttribute('data-option-index', index);
+        
+        option.values.forEach(function(value, valueIndex) {
+          const optionEl = document.createElement('option');
+          optionEl.value = value;
+          optionEl.textContent = value;
+          select.appendChild(optionEl);
+          
+          if (valueIndex === 0) {
+            selectedOptions[index] = value;
+          }
+        });
+        
+        select.addEventListener('change', function() {
+          const optionIndex = parseInt(this.getAttribute('data-option-index'));
+          selectedOptions[optionIndex] = this.value;
+          console.log('Option selected:', this.value);
+          updateVariant();
+        });
+        
+        group.appendChild(label);
+        group.appendChild(select);
+      }
+      
+      popupVariants.appendChild(group);
     });
     
-    if (product.options && product.options.length > 0) {
-      product.options.forEach(function(option, index) {
-        if (option.name !== 'Title' && option.values && option.values.length > 0) {
-          renderVariantOption(option, index, product, firstAvailableVariant);
-        }
-      });
-    }
-    
-    console.log('Selected variant ID:', selectedVariantId);
+    updateVariant();
   }
 
-  // === RENDER VARIANT OPTION ===
-  function renderVariantOption(option, optionIndex, product, firstVariant) {
-    const variantGroup = document.createElement('div');
-    variantGroup.className = 'tisso-variant-group';
+  // === UPDATE VARIANT ===
+  function updateVariant() {
+    if (!currentProductData) return;
     
-    const label = document.createElement('label');
-    label.className = 'tisso-variant-label';
-    label.textContent = option.name;
+    const product = currentProductData;
     
-    const isColorOption = option.name.toLowerCase() === 'color' || option.name.toLowerCase() === 'colour';
+    console.log('Updating variant...');
+    console.log('All selected options:', selectedOptions);
     
-    if (isColorOption) {
-      const colorContainer = document.createElement('div');
-      colorContainer.className = 'tisso-color-options';
-      
-      option.values.forEach(function(value) {
-        const colorButton = document.createElement('button');
-        colorButton.className = 'tisso-color-option';
-        colorButton.textContent = value;
-        colorButton.type = 'button';
-        
-        if (value === selectedOptions[optionIndex]) {
-          colorButton.classList.add('selected');
-        }
-        
-        colorButton.addEventListener('click', function(e) {
-          e.preventDefault();
-          colorContainer.querySelectorAll('.tisso-color-option').forEach(function(btn) {
-            btn.classList.remove('selected');
-          });
-          this.classList.add('selected');
-          selectedOptions[optionIndex] = value;
-          updateVariant(product);
-        });
-        
-        colorContainer.appendChild(colorButton);
-      });
-      
-      variantGroup.appendChild(label);
-      variantGroup.appendChild(colorContainer);
-    } else {
-      const select = document.createElement('select');
-      select.className = 'tisso-variant-select';
-      
-      option.values.forEach(function(value) {
-        const opt = document.createElement('option');
-        opt.value = value;
-        opt.textContent = value;
-        
-        if (value === selectedOptions[optionIndex]) {
-          opt.selected = true;
-        }
-        
-        select.appendChild(opt);
-      });
-      
-      select.addEventListener('change', function() {
-        selectedOptions[optionIndex] = this.value;
-        updateVariant(product);
-      });
-      
-      variantGroup.appendChild(label);
-      variantGroup.appendChild(select);
-    }
+    // Log each option individually
+    Object.keys(selectedOptions).forEach(key => {
+      console.log(`Option ${key}: "${selectedOptions[key]}"`);
+    });
     
-    popupVariants.appendChild(variantGroup);
-  }
-
-  // === UPDATE SELECTED VARIANT ===
-    function updateVariant(product) {
-      console.log('Updating variant with options:', selectedOptions);
-      console.log('Selected option values:', Object.values(selectedOptions));
-      
-      // Log each option individually
-      Object.keys(selectedOptions).forEach(key => {
-        console.log(`Option ${key}: "${selectedOptions[key]}"`);
+    const variant = product.variants.find(function(v) {
+      return v.options.every(function(optionValue, idx) {
+        return optionValue === selectedOptions[idx];
       });
+    });
+    
+    if (variant) {
+      selectedVariantId = variant.id;
+      popupPrice.textContent = formatPrice(variant.price);
+      console.log('New variant selected:', selectedVariantId, variant.title);
+      console.log('Variant options:', variant.options);
       
-      const variant = product.variants.find(function(v) {
-        return v.options.every(function(optionValue, idx) {
-          return optionValue === selectedOptions[idx];
-        });
-      });
-      
-      if (variant) {
-        selectedVariantId = variant.id;
-        popupPrice.textContent = formatPrice(variant.price);
-        console.log('New variant selected:', selectedVariantId, variant.title);
-        console.log('Variant options:', variant.options);
-        
-        if (!variant.available) {
-          addToCartBtn.disabled = true;
-          addToCartBtn.innerHTML = 'SOLD OUT';
-        } else {
-          addToCartBtn.disabled = false;
-          addToCartBtn.innerHTML = 'ADD TO CART <span class="arrow">⟶</span>';
-        }
+      if (!variant.available) {
+        addToCartBtn.disabled = true;
+        addToCartBtn.innerHTML = 'SOLD OUT';
+      } else {
+        addToCartBtn.disabled = false;
+        addToCartBtn.innerHTML = 'ADD TO CART <span class="arrow">⟶</span>';
       }
     }
+  }
 
-   // === ADD TO CART ===
+  // === ADD TO CART ===
   function addToCart() {
     if (!selectedVariantId) {
       showMessage('Please select options', 'error');
@@ -758,39 +748,35 @@ Dynamically renders variants, adds to cart, auto-adds Soft Winter Jacket for Bla
   }
 
   // === ADD SOFT WINTER JACKET ===
-    function addSoftWinterJacket() {
-      return fetch('/cart/add.js', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          id: SOFT_WINTER_JACKET_VARIANT_ID,
-          quantity: 1
-        })
-      })
-      .then(function(response) {
-        if (!response.ok) throw new Error('Failed to add bonus item');
-        return response.json();
-      })
-      .then(function() {
-        console.log('Soft Winter Jacket added successfully');
-        
-        // Dispatch the cart updated event
-        const event = new CustomEvent('tisso:cart-updated', {
-          detail: { from: 'soft-winter-jacket' }
-        });
-        document.dispatchEvent(event);
-        
-        showMessage('Added to cart! Bonus item included!', 'success');
-        setTimeout(closePopup, 2000);
-      })
-      .catch(function(error) {
-        console.error('Error adding bonus item:', error);
-        showMessage('Added to cart!', 'success');
-        setTimeout(closePopup, 1500);
-      });
+  function addSoftWinterJacket() {
+    console.log('Attempting to add Soft Winter Jacket with variant ID:', SOFT_WINTER_JACKET_VARIANT_ID);
+    
+    // Validate that the variant ID has been set
+    if (SOFT_WINTER_JACKET_VARIANT_ID === 'YOUR_SOFT_WINTER_JACKET_VARIANT_ID_HERE') {
+      console.error('ERROR: SOFT_WINTER_JACKET_VARIANT_ID is not configured!');
+      console.error('Please update the variant ID at the top of the script section.');
+      return Promise.reject(new Error('Variant ID not configured'));
     }
+    
+    return fetch('/cart/add.js', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: SOFT_WINTER_JACKET_VARIANT_ID,
+        quantity: 1
+      })
+    })
+    .then(function(response) {
+      if (!response.ok) throw new Error('Failed to add bonus item');
+      return response.json();
+    })
+    .then(function(data) {
+      console.log('Soft Winter Jacket added successfully:', data);
+      return data;
+    });
+  }
 
   // === POPUP CONTROLS ===
   function openPopup() {
@@ -860,6 +846,7 @@ Dynamically renders variants, adds to cart, auto-adds Soft Winter Jacket for Bla
   }
 
   console.log('Tisso Product Grid Script Loaded Successfully');
+  console.log('Soft Winter Jacket Variant ID:', SOFT_WINTER_JACKET_VARIANT_ID);
   
 })();
 </script>
