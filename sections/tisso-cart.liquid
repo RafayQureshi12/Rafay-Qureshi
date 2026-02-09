@@ -1,0 +1,178 @@
+<section id="tisso-cart-drawer" class="tisso-cart">
+  <!-- Overlay -->
+  <div class="tisso-cart-overlay"></div>
+
+  <!-- Drawer -->
+  <div class="tisso-cart-panel">
+    <div class="tisso-cart-header">
+      <h2>Your Cart</h2>
+      <button id="tisso-cart-close">✕</button>
+    </div>
+
+    <div id="tisso-cart-items" class="tisso-cart-items">
+      <!-- Cart items injected here -->
+    </div>
+
+    <div class="tisso-cart-footer">
+      <p><strong>Total:</strong> <span id="tisso-cart-total">€0.00</span></p>
+      <a href="/checkout" class="tisso-checkout-btn">Checkout</a>
+    </div>
+  </div>
+</section>
+
+<style>
+/* ===== CART BASE ===== */
+.tisso-cart {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  font-family: sans-serif;
+}
+
+/* ===== OVERLAY ===== */
+.tisso-cart-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* ===== PANEL ===== */
+.tisso-cart-panel {
+  position: absolute;
+  top: 0;
+  right: -420px;
+  width: 400px;
+  height: 100%;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  transition: right 0.35s ease;
+}
+
+/* ===== ACTIVE STATE ===== */
+.tisso-cart.active {
+  pointer-events: auto;
+}
+
+.tisso-cart.active .tisso-cart-overlay {
+  opacity: 1;
+}
+
+.tisso-cart.active .tisso-cart-panel {
+  right: 0;
+}
+
+/* ===== HEADER & FOOTER ===== */
+.tisso-cart-header,
+.tisso-cart-footer {
+  padding: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.tisso-cart-footer {
+  border-top: 1px solid #eee;
+  margin-top: auto;
+}
+
+.tisso-cart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#tisso-cart-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* ===== ITEMS ===== */
+.tisso-cart-items {
+  padding: 16px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.cart-item {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.cart-item img {
+  width: 60px;
+  height: 80px;
+  object-fit: cover;
+}
+
+/* ===== CHECKOUT ===== */
+.tisso-checkout-btn {
+  display: block;
+  width: 100%;
+  background: #000;
+  color: #fff;
+  text-align: center;
+  padding: 12px;
+  text-decoration: none;
+}
+</style>
+
+<script>
+(function () {
+  const cartDrawer = document.getElementById('tisso-cart-drawer');
+  const cartItemsEl = document.getElementById('tisso-cart-items');
+  const cartTotalEl = document.getElementById('tisso-cart-total');
+  const closeBtn = document.getElementById('tisso-cart-close');
+  const overlay = cartDrawer.querySelector('.tisso-cart-overlay');
+
+  function openCart() {
+    cartDrawer.classList.add('active');
+  }
+
+  function closeCart() {
+    cartDrawer.classList.remove('active');
+  }
+
+  closeBtn.addEventListener('click', closeCart);
+  overlay.addEventListener('click', closeCart);
+
+  async function loadCart() {
+    const cart = await fetch('/cart.js').then(res => res.json());
+
+    cartItemsEl.innerHTML = '';
+    cartTotalEl.textContent = (cart.total_price / 100).toFixed(2) + '€';
+
+    if (!cart.items.length) {
+      cartItemsEl.innerHTML = '<p>Your cart is empty</p>';
+      return;
+    }
+
+    cart.items.forEach(item => {
+      cartItemsEl.innerHTML += `
+        <div class="cart-item">
+          <img src="${item.image}" alt="${item.product_title}">
+          <div>
+            <p><strong>${item.product_title}</strong></p>
+            <p>${item.variant_title}</p>
+            <p>Qty: ${item.quantity}</p>
+            <p>${(item.line_price / 100).toFixed(2)}€</p>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  /* 🔔 Custom event to open + refresh cart */
+  document.addEventListener('tisso:cart-updated', () => {
+    loadCart();
+    openCart();
+  });
+
+  /* Initial load */
+  loadCart();
+})();
+</script>
