@@ -15,6 +15,16 @@
       {{ section.settings.button_text }} →
     </a>
   </div>
+
+  <!-- Mobile Menu Dropdown -->
+  <div class="mobile-menu-dropdown">
+    <div class="mobile-menu-content">
+      <p class="mobile-tagline">{{ section.settings.tagline }}</p>
+      <a href="{{ section.settings.button_link }}" class="mobile-menu-btn">
+        {{ section.settings.button_text }} →
+      </a>
+    </div>
+  </div>
 </header>
 
 
@@ -124,6 +134,60 @@
   .header-btn {
     display: none;
   }
+
+  /* Mobile Menu Dropdown */
+  .mobile-menu-dropdown {
+    display: block;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    background: {{ section.settings.mobile_menu_bg_color }};
+    border-bottom: 1px solid transparent;
+  }
+
+  .mobile-menu-dropdown.active {
+    max-height: 200px;
+    padding: 20px 16px;
+    border-bottom-color: #F5F5F5;
+  }
+
+  .mobile-menu-content {
+    text-align: center;
+  }
+
+  .mobile-tagline {
+    font-size: {{ section.settings.mobile_menu_tagline_size }}px;
+    color: {{ section.settings.mobile_menu_tagline_color }};
+    margin: 0 0 15px 0;
+    line-height: 1.4;
+  }
+
+  .mobile-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: {{ section.settings.button_bg_color }};
+    padding: {{ section.settings.button_padding_v }}px {{ section.settings.button_padding_h }}px;
+    color: {{ section.settings.button_text_color }};
+    text-decoration: none;
+    transition: background 0.3s, color 0.3s;
+    border-radius: {{ section.settings.button_border_radius }}px;
+    font-size: {{ section.settings.button_font_size }}px;
+    font-weight: {{ section.settings.button_font_weight }};
+  }
+
+  .mobile-menu-btn:hover,
+  .mobile-menu-btn:active {
+    background: {{ section.settings.button_hover_bg_color }};
+    color: {{ section.settings.button_hover_text_color }};
+  }
+}
+
+/* Hide mobile menu on desktop */
+@media (min-width: 769px) {
+  .mobile-menu-dropdown {
+    display: none;
+  }
 }
 </style>
 
@@ -133,11 +197,13 @@
   
   // Hamburger menu functionality
   const hamburger = document.querySelector('.hamburger-menu');
+  const mobileMenu = document.querySelector('.mobile-menu-dropdown');
   
-  if (hamburger) {
+  if (hamburger && mobileMenu) {
     hamburger.addEventListener('click', function() {
       // Toggle menu open/closed
       this.classList.toggle('active');
+      mobileMenu.classList.toggle('active');
       
       // Add animation to hamburger
       const spans = this.querySelectorAll('span');
@@ -156,6 +222,15 @@
         detail: { isOpen: this.classList.contains('active') }
       });
       document.dispatchEvent(event);
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) {
+        if (hamburger.classList.contains('active')) {
+          hamburger.click();
+        }
+      }
     });
   }
 })();
@@ -352,6 +427,32 @@
       "type": "color",
       "id": "hamburger_hover_color",
       "label": "Hamburger Hover Color",
+      "default": "#666666"
+    },
+    {
+      "type": "header",
+      "content": "Mobile Menu Dropdown"
+    },
+    {
+      "type": "color",
+      "id": "mobile_menu_bg_color",
+      "label": "Mobile Menu Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "mobile_menu_tagline_size",
+      "label": "Mobile Menu Tagline Size",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "mobile_menu_tagline_color",
+      "label": "Mobile Menu Tagline Color",
       "default": "#666666"
     }
   ],
