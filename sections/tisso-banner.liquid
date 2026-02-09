@@ -37,7 +37,6 @@
   }
 
   /* Frame 1 - No border (spans full width at top) */
-  /* Desktop: 1440px width x 390px height */
   .tisso-frame-1 {
     grid-column: 1 / -1;
     grid-row: 1;
@@ -51,7 +50,6 @@
   }
 
   /* Frame 2 - No border (bottom right - Product details) */
-  /* Desktop: 890px width x 402px height */
   .tisso-frame-2 {
     grid-column: 2;
     grid-row: 2;
@@ -139,11 +137,14 @@
     transform: translateX(5px);
   }
 
-  /* Responsive design */
+  /* ────────────────────────────────────────────────
+     IMPROVED MOBILE VIEW – BETTER SPACING & LAYOUT
+  ──────────────────────────────────────────────── */
   @media (max-width: 768px) {
     .tisso-banner-container {
       padding: 0;
       background: white;
+      margin-bottom: 20px;
     }
 
     .tisso-frames-wrapper {
@@ -151,18 +152,17 @@
       grid-template-rows: auto;
       position: relative;
       background: white;
-      min-height: 600px;
+      min-height: 680px;
     }
 
-    /* Frame 3 - Text content on white background at top */
+    /* Frame 3 - Text content centered at top on white background */
     .tisso-frame-3 {
-      display: flex;
       position: relative;
       grid-column: 1;
       grid-row: 1;
       background: white;
       z-index: 20;
-      padding: 30px 20px;
+      padding: 40px 24px 30px;
       justify-content: center;
       align-items: center;
       text-align: center;
@@ -170,44 +170,46 @@
     }
 
     .frame-3-content {
-      max-width: 90%;
+      max-width: 480px;
+      width: 100%;
     }
 
     .frame-3-title {
       font-size: {{ section.settings.frame3_title_mobile_size }}px;
       color: {{ section.settings.frame3_title_mobile_color }};
-      margin-bottom: 10px;
+      margin-bottom: 16px;
+      line-height: 1.15;
     }
 
     .frame-3-description {
       font-size: {{ section.settings.frame3_desc_mobile_size }}px;
       color: {{ section.settings.frame3_desc_mobile_color }};
       max-width: 100%;
-      margin-bottom: 20px;
-      line-height: 1.4;
+      margin-bottom: 28px;
+      line-height: 1.5;
     }
 
-    /* Frame 1 - Image positioned below text with specific positioning */
+    /* Frame 1 - Centered product flatlay image below text */
     .tisso-frame-1 {
-      position: absolute;
-      width: 686px;
-      height: 264px;
-      top: 157px;
-      left: -140px;
-      opacity: 1;
-      transform: rotate(0deg);
-      overflow: visible;
+      position: relative;
+      width: 100%;
+      max-width: 360px;
+      height: auto;
+      margin: 0 auto 40px auto;
       padding: 0;
       grid-column: 1;
       grid-row: 1;
       z-index: 10;
+      transform: none;
+      opacity: 1;
+      overflow: visible;
     }
 
     .tisso-frame-1 .frame-image {
       width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center;
+      height: auto;
+      object-fit: contain;
+      display: block;
     }
 
     /* Hide Frame 2 on mobile */
@@ -215,22 +217,17 @@
       display: none;
     }
 
-    .bottom-text {
-      font-size: 10px !important;
-      padding: 10px 5px;
-    }
-
-    /* Ensure button is visible on mobile */
+    /* Button improvements */
     .tisso-cta-button {
       font-size: {{ section.settings.button_mobile_size }}px;
       padding: {{ section.settings.button_mobile_padding_v }}px {{ section.settings.button_mobile_padding_h }}px;
+      min-width: 180px;
+      justify-content: center;
     }
 
-    /* Ensure wrapper has enough height for absolutely positioned image */
+    /* Remove forced height hack */
     .tisso-frames-wrapper::after {
-      content: '';
-      display: block;
-      height: 450px;
+      content: none;
     }
   }
 
@@ -250,7 +247,7 @@
     text-transform: {{ section.settings.bottom_text_transform }};
   }
 
-  /* Animation classes for JavaScript */
+  /* Animation classes */
   .tisso-animate-fade-in {
     opacity: 0;
     transform: translateY(20px);
@@ -266,7 +263,7 @@
 <div class="tisso-banner-container" id="tisso-banner-{{ section.id }}">
   <div class="tisso-frames-wrapper">
     
-    {% comment %} Frame 3 - Gift Guide (Bottom Left on Desktop, Top on Mobile) {% endcomment %}
+    {% comment %} Frame 3 - Gift Guide {% endcomment %}
     <div class="tisso-frame-3 tisso-animate-fade-in" data-animation-delay="200">
       <div class="frame-3-content">
         {% if section.settings.frame3_title != blank %}
@@ -274,7 +271,7 @@
         {% endif %}
         
         {% if section.settings.frame3_description != blank %}
-          <p class="frame-3-description">{{ section.settings.frame3_description }}</p>
+          <div class="frame-3-description">{{ section.settings.frame3_description }}</div>
         {% endif %}
         
         {% if section.settings.frame3_button_text != blank %}
@@ -286,7 +283,7 @@
       </div>
     </div>
 
-    {% comment %} Frame 1 - Top (No Border) {% endcomment %}
+    {% comment %} Frame 1 - Top Image {% endcomment %}
     <div class="tisso-frame-1 tisso-animate-fade-in" data-animation-delay="0">
       {% if section.settings.frame1_image %}
         <img 
@@ -302,7 +299,7 @@
       {% endif %}
     </div>
 
-    {% comment %} Frame 2 - Bottom Right (No Border) {% endcomment %}
+    {% comment %} Frame 2 - Bottom Right Image {% endcomment %}
     <div class="tisso-frame-2 tisso-animate-fade-in" data-animation-delay="400">
       {% if section.settings.frame2_image %}
         <img 
@@ -329,65 +326,43 @@
 {% endif %}
 
 <script>
-  /**
-   * Tisso Banner Animation Controller
-   * Handles intersection observer for fade-in animations
-   * Pure Vanilla JavaScript - No jQuery
-   */
   (function() {
     'use strict';
-
-    // Wait for DOM to be fully loaded
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initTissoBanner);
-    } else {
-      initTissoBanner();
-    }
 
     function initTissoBanner() {
       const bannerId = 'tisso-banner-{{ section.id }}';
       const bannerContainer = document.getElementById(bannerId);
       
-      if (!bannerContainer) {
-        console.warn('Tisso Banner container not found');
-        return;
-      }
+      if (!bannerContainer) return;
 
-      // Get all animated elements
       const animatedElements = bannerContainer.querySelectorAll('.tisso-animate-fade-in');
 
-      // Intersection Observer options
       const observerOptions = {
-        root: null, // viewport
-        rootMargin: '0px 0px -100px 0px', // Trigger slightly before element enters viewport
-        threshold: 0.1 // Trigger when 10% of element is visible
+        root: null,
+        rootMargin: '0px 0px -100px 0px',
+        threshold: 0.1
       };
 
-      // Callback function when element intersects
       const handleIntersection = function(entries, observer) {
         entries.forEach(function(entry) {
           if (entry.isIntersecting) {
-            // Get animation delay from data attribute
             const delay = parseInt(entry.target.getAttribute('data-animation-delay')) || 0;
-            
-            // Add visible class after delay
             setTimeout(function() {
               entry.target.classList.add('visible');
             }, delay);
-
-            // Stop observing this element
             observer.unobserve(entry.target);
           }
         });
       };
 
-      // Create intersection observer
       const observer = new IntersectionObserver(handleIntersection, observerOptions);
+      animatedElements.forEach(el => observer.observe(el));
+    }
 
-      // Observe all animated elements
-      animatedElements.forEach(function(element) {
-        observer.observe(element);
-      });
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initTissoBanner);
+    } else {
+      initTissoBanner();
     }
   })();
 </script>
@@ -470,7 +445,7 @@
     },
     {
       "type": "header",
-      "content": "Frame 3 - Gift Guide Section (Bottom Left)"
+      "content": "Frame 3 - Gift Guide Section"
     },
     {
       "type": "color",
@@ -480,7 +455,7 @@
     },
     {
       "type": "header",
-      "content": "📝 Gift Guide Title (Editable)"
+      "content": "📝 Gift Guide Title"
     },
     {
       "type": "text",
@@ -518,7 +493,7 @@
     },
     {
       "type": "header",
-      "content": "📝 Gift Guide Description (Editable)"
+      "content": "📝 Gift Guide Description"
     },
     {
       "type": "richtext",
@@ -564,15 +539,13 @@
       "max": 40,
       "step": 2,
       "unit": "px",
-      "default": 28,
-      "info": "Title size when overlaid on image in mobile view"
+      "default": 28
     },
     {
       "type": "color",
       "id": "frame3_title_mobile_color",
       "label": "Mobile Title Color",
-      "default": "#000000",
-      "info": "Title color on mobile (overlaid on image)"
+      "default": "#000000"
     },
     {
       "type": "range",
@@ -582,15 +555,13 @@
       "max": 18,
       "step": 1,
       "unit": "px",
-      "default": 14,
-      "info": "Description size when overlaid on image"
+      "default": 14
     },
     {
       "type": "color",
       "id": "frame3_desc_mobile_color",
       "label": "Mobile Description Color",
-      "default": "#333333",
-      "info": "Description color on mobile (overlaid on image)"
+      "default": "#333333"
     },
     {
       "type": "range",
@@ -624,48 +595,42 @@
     },
     {
       "type": "header",
-      "content": "🔘 Button Settings (Editable)"
+      "content": "🔘 Button Settings"
     },
     {
       "type": "text",
       "id": "frame3_button_text",
       "label": "Button Text",
-      "default": "SHOP NOW",
-      "info": "Button text - fully editable"
+      "default": "SHOP NOW"
     },
     {
       "type": "url",
       "id": "frame3_button_link",
-      "label": "Button Link URL",
-      "info": "Where the button should navigate to"
+      "label": "Button Link URL"
     },
     {
       "type": "color",
       "id": "button_bg_color",
       "label": "Button Background Color",
-      "default": "#FFF544",
-      "info": "Default: Yellow (#FFF544)"
+      "default": "#FFF544"
     },
     {
       "type": "color",
       "id": "button_text_color",
       "label": "Button Text Color",
-      "default": "#000000",
-      "info": "Default: Black"
+      "default": "#000000"
     },
     {
       "type": "color",
       "id": "button_hover_bg_color",
       "label": "Button Hover Background Color",
-      "default": "#000000",
-      "info": "Default: Black - appears on hover"
+      "default": "#000000"
     },
     {
       "type": "color",
       "id": "button_hover_text_color",
       "label": "Button Hover Text Color",
-      "default": "#ffffff",
-      "info": "Default: White - appears on hover"
+      "default": "#ffffff"
     },
     {
       "type": "range",
@@ -720,14 +685,13 @@
     },
     {
       "type": "header",
-      "content": "📝 Bottom Text Banner (Editable)"
+      "content": "📝 Bottom Text Banner"
     },
     {
       "type": "text",
       "id": "bottom_text",
       "label": "Bottom Text",
-      "default": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6X",
-      "info": "Text displayed at the bottom of the banner"
+      "default": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6X"
     },
     {
       "type": "range",
