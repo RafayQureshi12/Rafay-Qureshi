@@ -320,7 +320,7 @@ Dynamically renders variants, adds to cart, auto-adds Soft Winter Jacket for Bla
   font-weight: 600;
   letter-spacing: 0.5px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -328,17 +328,16 @@ Dynamically renders variants, adds to cart, auto-adds Soft Winter Jacket for Bla
   text-transform: uppercase;
 }
 
-.tisso-popup__add-to-cart .arrow {
-  font-size: 16px;
-  transition: transform 0.3s ease;
-}
-
 .tisso-popup__add-to-cart:hover:not(:disabled) {
-  background: #333;
+  background: #FFF544;
+  color: #000;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .tisso-popup__add-to-cart:hover:not(:disabled) .arrow {
   transform: translateX(4px);
+  color: #000;
 }
 
 .tisso-popup__add-to-cart:disabled {
@@ -617,7 +616,9 @@ Dynamically renders variants, adds to cart, auto-adds Soft Winter Jacket for Bla
   }
 
   // === ADD TO CART ===
-  function addToCart() {
+  
+
+function addToCart() {
     if (!selectedVariantId) {
       showMessage('Please select options', 'error');
       return;
@@ -643,7 +644,6 @@ Dynamically renders variants, adds to cart, auto-adds Soft Winter Jacket for Bla
       if (!response.ok) throw new Error('Failed to add to cart');
       return response.json();
     })
-
     .then(function(data) {
       console.log('Added to cart successfully:', data);
       
@@ -655,45 +655,39 @@ Dynamically renders variants, adds to cart, auto-adds Soft Winter Jacket for Bla
         return opt && opt.toLowerCase() === 'medium';
       });
       
+      console.log('Checking Black + Medium:', { hasBlack, hasMedium, selectedOptions });
+      
       if (hasBlack && hasMedium) {
-        console.log('Black + Medium detected, adding Soft Winter Jacket');
+        console.log('✅ Black + Medium detected, adding Soft Winter Jacket');
         return addSoftWinterJacket().then(function() {
-          // Event will be dispatched from addSoftWinterJacket
+          // Event already dispatched in addSoftWinterJacket
+          return new Promise(resolve => setTimeout(resolve, 100));
         });
       } else {
         showMessage('Added to cart!', 'success');
         
         // Dispatch cart update event
-        setTimeout(function() {
-          const event = new CustomEvent('tisso:cart-updated', {
-            detail: { 
-              product: currentProductHandle,
-              variant: selectedVariantId 
-            }
-          });
-          document.dispatchEvent(event);
-          console.log('Dispatched tisso:cart-updated event');
-          
-          closePopup();
-        }, 500);
+        const event = new CustomEvent('tisso:cart-updated', {
+          detail: { 
+            product: currentProductHandle,
+            variant: selectedVariantId 
+          }
+        });
+        document.dispatchEvent(event);
+        console.log('Dispatched tisso:cart-updated event');
+        
+        // Close popup after a delay
+        setTimeout(closePopup, 1500);
+        return Promise.resolve();
       }
     })
-
     .then(function() {
-      // Trigger cart refresh events
-      if (typeof Shopify !== 'undefined' && Shopify.theme && Shopify.theme.cartRefresh) {
-        Shopify.theme.cartRefresh();
-      }
-      document.dispatchEvent(new CustomEvent('cart:refresh'));
-      
       // Trigger Shopify cart update event
-      if (typeof window.Shopify !== 'undefined') {
-        fetch('/cart.js')
-          .then(function(res) { return res.json(); })
-          .then(function(cart) {
-            document.dispatchEvent(new CustomEvent('cart:updated', { detail: cart }));
-          });
-      }
+      return fetch('/cart.js')
+        .then(function(res) { return res.json(); })
+        .then(function(cart) {
+          document.dispatchEvent(new CustomEvent('cart:updated', { detail: cart }));
+        });
     })
     .catch(function(error) {
       console.error('Cart error:', error);

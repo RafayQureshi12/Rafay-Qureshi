@@ -1,7 +1,3 @@
-{% comment %}
-Tisso Cart Drawer - Include this snippet anywhere in your theme
-{% endcomment %}
-
 <div id="tisso-cart-drawer" class="tisso-cart-drawer">
   <!-- Overlay -->
   <div class="tisso-cart-drawer__overlay"></div>
@@ -132,6 +128,7 @@ Tisso Cart Drawer - Include this snippet anywhere in your theme
   gap: 15px;
   padding: 15px 0;
   border-bottom: 1px solid #f0f0f0;
+  position: relative;
 }
 
 .tisso-cart-item:last-child {
@@ -147,12 +144,14 @@ Tisso Cart Drawer - Include this snippet anywhere in your theme
 
 .tisso-cart-item__details {
   flex: 1;
+  min-width: 0;
 }
 
 .tisso-cart-item__title {
   font-weight: 600;
   font-size: 14px;
   margin: 0 0 5px 0;
+  line-height: 1.3;
 }
 
 .tisso-cart-item__variant {
@@ -170,6 +169,23 @@ Tisso Cart Drawer - Include this snippet anywhere in your theme
   font-weight: 600;
   font-size: 14px;
   margin: 8px 0 0 0;
+}
+
+.tisso-cart-item__remove {
+  position: absolute;
+  top: 15px;
+  right: 0;
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 2px 6px;
+  transition: color 0.2s ease;
+}
+
+.tisso-cart-item__remove:hover {
+  color: #ff0000;
 }
 
 /* Footer */
@@ -205,7 +221,8 @@ Tisso Cart Drawer - Include this snippet anywhere in your theme
 }
 
 .tisso-cart-drawer__checkout:hover {
-  background: #333;
+  background: #FFF544;
+  color: #000;
 }
 
 /* Mobile */
@@ -217,6 +234,13 @@ Tisso Cart Drawer - Include this snippet anywhere in your theme
   
   .tisso-cart-drawer.active .tisso-cart-drawer__panel {
     right: 0;
+  }
+  
+  .tisso-cart-item__remove {
+    position: relative;
+    top: 0;
+    right: 0;
+    margin-top: 8px;
   }
 }
 </style>
@@ -273,6 +297,37 @@ Tisso Cart Drawer - Include this snippet anywhere in your theme
       }
     });
     
+    // Remove item from cart
+    async function removeItem(line) {
+      try {
+        const response = await fetch('/cart/change.js', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            id: line,
+            quantity: 0
+          })
+        });
+        
+        const cart = await response.json();
+        console.log('Item removed, cart updated:', cart);
+        
+        // Refresh cart display
+        loadCart();
+        
+        // Dispatch event to notify other components
+        const event = new CustomEvent('tisso:cart-updated', {
+          detail: { action: 'removed', line: line }
+        });
+        document.dispatchEvent(event);
+        
+      } catch (error) {
+        console.error('Error removing item:', error);
+      }
+    }
+    
     // Load cart data
     async function loadCart() {
       console.log('Loading cart data...');
@@ -309,11 +364,20 @@ Tisso Cart Drawer - Include this snippet anywhere in your theme
                   <p class="tisso-cart-item__quantity">Quantity: ${item.quantity}</p>
                   <p class="tisso-cart-item__price">€${(item.line_price / 100).toFixed(2)}</p>
                 </div>
+                <button class="tisso-cart-item__remove" data-line="${item.id}">Remove</button>
               </div>
             `;
           });
           
           itemsEl.innerHTML = itemsHTML;
+          
+          // Add event listeners to remove buttons
+          itemsEl.querySelectorAll('.tisso-cart-item__remove').forEach(button => {
+            button.addEventListener('click', function() {
+              const lineId = this.getAttribute('data-line');
+              removeItem(lineId);
+            });
+          });
         }
         
       } catch (error) {
@@ -343,7 +407,7 @@ Tisso Cart Drawer - Include this snippet anywhere in your theme
       refresh: loadCart
     };
     
-    console.log('Tisso Cart Drawer Initialized');
+    console.log('✅ Tisso Cart Drawer Initialized');
   }
   
   // Initialize when DOM is ready
