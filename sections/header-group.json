@@ -13,18 +13,6 @@
   "sections": {
     "announcement-bar": {
       "type": "announcement-bar",
-      "blocks": {
-        "announcement-bar-0": {
-          "type": "announcement",
-          "settings": {
-            "text": "Welcome to our store",
-            "link": ""
-          }
-        }
-      },
-      "block_order": [
-        "announcement-bar-0"
-      ],
       "settings": {
         "auto_rotate": false,
         "change_slides_speed": 5,
@@ -51,8 +39,10 @@
         "background_color": "#ffffff",
         "section_padding": 40,
         "frame_padding": 30,
+        "frame1_image": "shopify://shop_images/Frame.png",
         "frame1_image_alt": "Product flatlay",
         "frame1_bg_color": "#ffffff",
+        "frame2_image": "shopify://shop_images/Frame_2.png",
         "frame2_image_alt": "Product details",
         "frame2_bg_color": "#ffffff",
         "frame3_bg_color": "#ffffff",
@@ -68,7 +58,7 @@
         "frame3_button_link": "",
         "button_bg_color": "#000000",
         "button_text_color": "#ffffff",
-        "button_hover_bg_color": "#FFF544",
+        "button_hover_bg_color": "#fff544",
         "button_hover_text_color": "#000000",
         "button_font_size": 14,
         "button_font_weight": "700",
