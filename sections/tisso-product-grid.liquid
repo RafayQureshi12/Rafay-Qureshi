@@ -404,9 +404,9 @@ Dynamically renders variants, adds to cart, auto-adds Soft Winter Jacket for Bla
 (function() {
   'use strict';
 
-  
+  // === CONFIGURATION - ADD YOUR SOFT WINTER JACKET VARIANT ID HERE ===
   // IMPORTANT: Replace this with the actual variant ID of your Soft Winter Jacket
-  const SOFT_WINTER_JACKET_VARIANT_ID = '51380014580033';
+  const SOFT_WINTER_JACKET_VARIANT_ID = 'YOUR_SOFT_WINTER_JACKET_VARIANT_ID_HERE';
   // To find the variant ID:
   // 1. Go to your Shopify admin > Products > Soft Winter Jacket
   // 2. Click on the variant you want to add
@@ -638,10 +638,22 @@ Dynamically renders variants, adds to cart, auto-adds Soft Winter Jacket for Bla
     
     console.log('Lowercase option values:', optionValuesLower);
     
-    const hasBlack = optionValuesLower.includes('black');
-    const hasMedium = optionValuesLower.includes('medium');
+    // Check for Black (handle variations)
+    const hasBlack = optionValuesLower.some(opt => 
+      opt === 'black' || opt === 'noir' || opt.includes('black')
+    );
     
-    console.log('Black + Medium check:', { hasBlack, hasMedium, optionValuesLower });
+    // Check for Medium (handle variations like "M", "Med", "Medium")
+    const hasMedium = optionValuesLower.some(opt => 
+      opt === 'medium' || opt === 'm' || opt === 'med' || opt.includes('medium')
+    );
+    
+    console.log('Black + Medium check:', { 
+      hasBlack, 
+      hasMedium, 
+      optionValuesLower,
+      willAddBonus: hasBlack && hasMedium 
+    });
     
     // Add the main product first
     fetch('/cart/add.js', {
