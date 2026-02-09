@@ -23,7 +23,7 @@
     margin: 0 auto;
   }
 
-  /* Frame 1 - No border */
+  /* Frame 1 - No border (spans full width at top) */
   /* Desktop: 1440px width x 390px height */
   .tisso-frame-1 {
     grid-column: 1 / -1;
@@ -138,36 +138,79 @@
 
   /* Responsive design */
   @media (max-width: 768px) {
+    .tisso-banner-container {
+      padding: 0;
+    }
+
     .tisso-frames-wrapper {
       grid-template-columns: 1fr;
       grid-template-rows: auto;
+      position: relative;
     }
 
-    /* Frame 1 - Full width on mobile */
+    /* Frame 1 - Full width on mobile with overlay content */
     .tisso-frame-1 {
       grid-column: 1;
       width: 100%;
       height: auto;
-      min-height: 300px;
+      min-height: 500px;
+      position: relative;
     }
 
     .tisso-frame-1 .frame-image {
       height: auto;
-      min-height: 300px;
+      min-height: 500px;
+      object-fit: cover;
     }
 
-    /* Hide Frame 2 and Frame 3 on mobile */
-    .tisso-frame-2,
+    /* Show Frame 3 content overlaid on Frame 1 on mobile */
     .tisso-frame-3 {
-      display: none;
+      display: flex;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: transparent;
+      z-index: 10;
+      padding: 40px 20px;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .frame-3-content {
+      max-width: 90%;
+    }
+
+    .frame-3-title {
+      font-size: {{ section.settings.frame3_title_mobile_size }}px;
+      color: {{ section.settings.frame3_title_mobile_color }};
+      margin-bottom: 15px;
     }
 
     .frame-3-description {
+      font-size: {{ section.settings.frame3_desc_mobile_size }}px;
+      color: {{ section.settings.frame3_desc_mobile_color }};
       max-width: 100%;
+      margin-bottom: 25px;
+      line-height: 1.5;
+    }
+
+    /* Hide Frame 2 on mobile */
+    .tisso-frame-2 {
+      display: none;
     }
 
     .bottom-text {
       font-size: 10px !important;
+      padding: 10px 5px;
+    }
+
+    /* Ensure button is visible on mobile */
+    .tisso-cta-button {
+      font-size: {{ section.settings.button_mobile_size }}px;
+      padding: {{ section.settings.button_mobile_padding_v }}px {{ section.settings.button_mobile_padding_h }}px;
     }
   }
 
@@ -488,6 +531,76 @@
       "max": 2.0,
       "step": 0.1,
       "default": 1.6
+    },
+    {
+      "type": "header",
+      "content": "📱 Mobile Overlay Settings"
+    },
+    {
+      "type": "range",
+      "id": "frame3_title_mobile_size",
+      "label": "Mobile Title Font Size",
+      "min": 20,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 28,
+      "info": "Title size when overlaid on image in mobile view"
+    },
+    {
+      "type": "color",
+      "id": "frame3_title_mobile_color",
+      "label": "Mobile Title Color",
+      "default": "#000000",
+      "info": "Title color on mobile (overlaid on image)"
+    },
+    {
+      "type": "range",
+      "id": "frame3_desc_mobile_size",
+      "label": "Mobile Description Font Size",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 14,
+      "info": "Description size when overlaid on image"
+    },
+    {
+      "type": "color",
+      "id": "frame3_desc_mobile_color",
+      "label": "Mobile Description Color",
+      "default": "#333333",
+      "info": "Description color on mobile (overlaid on image)"
+    },
+    {
+      "type": "range",
+      "id": "button_mobile_size",
+      "label": "Mobile Button Font Size",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "button_mobile_padding_v",
+      "label": "Mobile Button Vertical Padding",
+      "min": 8,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "button_mobile_padding_h",
+      "label": "Mobile Button Horizontal Padding",
+      "min": 15,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 20
     },
     {
       "type": "header",
