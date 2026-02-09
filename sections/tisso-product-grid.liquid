@@ -1,5 +1,6 @@
 {% comment %}
-Tisso Product Grid - Side by Side Layout with Color Swatches
+Tisso Product Grid - Final Version
+Dynamically renders variants, adds to cart, auto-adds Soft Winter Jacket for Black + Medium
 {% endcomment %}
 
 <section class="tisso-grid">
@@ -269,7 +270,7 @@ Tisso Product Grid - Side by Side Layout with Color Swatches
   border-color: #000;
 }
 
-/* === COLOR SWATCH BUTTONS === */
+/* === COLOR BUTTONS - EXACTLY LIKE REFERENCE === */
 .tisso-color-options {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -278,93 +279,31 @@ Tisso Product Grid - Side by Side Layout with Color Swatches
 }
 
 .tisso-color-option {
-  padding: 0;
+  padding: 12px 16px;
   border: none;
   border-right: 1px solid #000;
   background: white;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.3s ease;
   font-size: 14px;
   font-weight: 400;
-  text-align: left;
+  text-align: center;
   color: #000;
   position: relative;
-  display: flex;
-  align-items: center;
-  padding: 12px 16px;
-  gap: 10px;
 }
 
 .tisso-color-option:last-child {
   border-right: none;
 }
 
-.tisso-color-option::before {
-  content: '';
-  width: 24px;
-  height: 24px;
-  border: 1px solid #ddd;
-  flex-shrink: 0;
-  display: block;
-}
-
-/* Color swatch backgrounds */
-.tisso-color-option[data-color="blue"]::before {
-  background-color: #4A90E2;
-}
-
-.tisso-color-option[data-color="black"]::before {
-  background-color: #000;
-}
-
-.tisso-color-option[data-color="white"]::before {
-  background-color: #fff;
-  border-color: #000;
-}
-
-.tisso-color-option[data-color="red"]::before {
-  background-color: #E53935;
-}
-
-.tisso-color-option[data-color="green"]::before {
-  background-color: #43A047;
-}
-
-.tisso-color-option[data-color="yellow"]::before {
-  background-color: #FDD835;
-}
-
-.tisso-color-option[data-color="pink"]::before {
-  background-color: #EC407A;
-}
-
-.tisso-color-option[data-color="gray"]::before,
-.tisso-color-option[data-color="grey"]::before {
-  background-color: #9E9E9E;
-}
-
-.tisso-color-option[data-color="brown"]::before {
-  background-color: #795548;
-}
-
-.tisso-color-option[data-color="navy"]::before {
-  background-color: #1A237E;
-}
-
-.tisso-color-option[data-color="orange"]::before {
-  background-color: #FF6F00;
-}
-
-.tisso-color-option[data-color="purple"]::before {
-  background-color: #7B1FA2;
-}
-
+/* Selected state - fills entire button with black background and white text */
 .tisso-color-option.selected {
-  background: #f5f5f5;
+  background: #000;
+  color: white;
 }
 
 .tisso-color-option:hover:not(.selected) {
-  background: #fafafa;
+  background: #f5f5f5;
 }
 
 /* === ADD TO CART BUTTON === */
@@ -601,7 +540,6 @@ Tisso Product Grid - Side by Side Layout with Color Swatches
         colorButton.className = 'tisso-color-option';
         colorButton.textContent = value;
         colorButton.type = 'button';
-        colorButton.setAttribute('data-color', value.toLowerCase());
         
         if (value === selectedOptions[optionIndex]) {
           colorButton.classList.add('selected');
@@ -705,6 +643,7 @@ Tisso Product Grid - Side by Side Layout with Color Swatches
     .then(function(data) {
       console.log('Added to cart successfully:', data);
       
+      // Check for Black + Medium auto-add
       const hasBlack = Object.values(selectedOptions).some(function(opt) {
         return opt && opt.toLowerCase() === 'black';
       });
@@ -721,10 +660,20 @@ Tisso Product Grid - Side by Side Layout with Color Swatches
       }
     })
     .then(function() {
+      // Trigger cart refresh events
       if (typeof Shopify !== 'undefined' && Shopify.theme && Shopify.theme.cartRefresh) {
         Shopify.theme.cartRefresh();
       }
       document.dispatchEvent(new CustomEvent('cart:refresh'));
+      
+      // Trigger Shopify cart update event
+      if (typeof window.Shopify !== 'undefined') {
+        fetch('/cart.js')
+          .then(function(res) { return res.json(); })
+          .then(function(cart) {
+            document.dispatchEvent(new CustomEvent('cart:updated', { detail: cart }));
+          });
+      }
     })
     .catch(function(error) {
       console.error('Cart error:', error);
