@@ -13,18 +13,6 @@
   "sections": {
     "announcement-bar": {
       "type": "announcement-bar",
-      "blocks": {
-        "announcement-bar-0": {
-          "type": "announcement",
-          "settings": {
-            "text": "Welcome to our store",
-            "link": ""
-          }
-        }
-      },
-      "block_order": [
-        "announcement-bar-0"
-      ],
       "settings": {
         "auto_rotate": false,
         "change_slides_speed": 5,
@@ -37,11 +25,58 @@
     },
     "header": {
       "type": "tisso-header",
-      "settings": {}
+      "settings": {
+        "logo_text": "TISSO VISION",
+        "tagline": "Find the ideal gift for your loved ones.",
+        "button_text": "CHOOSE GIFT",
+        "button_link": ""
+      }
+    },
+    "tisso_banner_pcJt7q": {
+      "type": "tisso-banner",
+      "name": "Tisso Banner Frames",
+      "settings": {
+        "background_color": "#ffffff",
+        "section_padding": 40,
+        "frame_padding": 30,
+        "frame1_image": "shopify://shop_images/Frame.png",
+        "frame1_image_alt": "Product flatlay",
+        "frame1_bg_color": "#ffffff",
+        "frame2_image": "shopify://shop_images/Frame_2.png",
+        "frame2_image_alt": "Product details",
+        "frame2_bg_color": "#ffffff",
+        "frame3_bg_color": "#ffffff",
+        "frame3_title": "The Gift Guide",
+        "frame3_title_size": 36,
+        "frame3_title_weight": "700",
+        "frame3_title_color": "#000000",
+        "frame3_description": "<p>Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season.</p>",
+        "frame3_desc_size": 14,
+        "frame3_desc_color": "#666666",
+        "frame3_desc_line_height": 1.6,
+        "frame3_button_text": "SHOP NOW",
+        "frame3_button_link": "",
+        "button_bg_color": "#000000",
+        "button_text_color": "#ffffff",
+        "button_hover_bg_color": "#fff544",
+        "button_hover_text_color": "#000000",
+        "button_font_size": 14,
+        "button_font_weight": "700",
+        "button_padding_v": 12,
+        "button_padding_h": 30,
+        "button_border_radius": 4,
+        "bottom_text": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6X",
+        "bottom_text_size": 12,
+        "bottom_text_color": "#666666",
+        "bottom_text_bg_color": "#ffffff",
+        "bottom_text_padding": 15,
+        "bottom_text_transform": "uppercase"
+      }
     }
   },
   "order": [
     "announcement-bar",
-    "header"
+    "header",
+    "tisso_banner_pcJt7q"
   ]
 }
