@@ -9,36 +9,61 @@
  */
 {
   "sections": {
-    "featured_collection": {
-      "type": "featured-collection",
+    "tisso_product_grid_UR9w6D": {
+      "type": "tisso-product-grid",
+      "blocks": {
+        "product_qkrGVm": {
+          "type": "product",
+          "settings": {
+            "product": "black-leather-bag"
+          }
+        },
+        "product_grFUn8": {
+          "type": "product",
+          "settings": {
+            "product": "blue-silk-tuxedo"
+          }
+        },
+        "product_zAkWUY": {
+          "type": "product",
+          "settings": {
+            "product": "chequered-red-shirt"
+          }
+        },
+        "product_qkaUBR": {
+          "type": "product",
+          "settings": {
+            "product": "classic-leather-jacket"
+          }
+        },
+        "product_CUwtcJ": {
+          "type": "product",
+          "settings": {
+            "product": "classic-varsity-top"
+          }
+        },
+        "product_jWwEt7": {
+          "type": "product",
+          "settings": {
+            "product": "dark-denim-top"
+          }
+        }
+      },
+      "block_order": [
+        "product_qkrGVm",
+        "product_grFUn8",
+        "product_zAkWUY",
+        "product_qkaUBR",
+        "product_CUwtcJ",
+        "product_jWwEt7"
+      ],
+      "name": "Tisso Product Grid",
       "settings": {
-        "collection": "all",
-        "products_to_show": 8,
-        "title": "Featured products",
-        "heading_size": "h2",
-        "description": "",
-        "show_description": false,
-        "description_style": "body",
-        "columns_desktop": 4,
-        "enable_desktop_slider": false,
-        "full_width": false,
-        "show_view_all": true,
-        "view_all_style": "solid",
-        "color_scheme": "scheme-1",
-        "image_ratio": "adapt",
-        "image_shape": "default",
-        "show_secondary_image": true,
-        "show_vendor": false,
-        "show_rating": false,
-        "quick_add": "none",
-        "columns_mobile": "2",
-        "swipe_on_mobile": false,
-        "padding_top": 44,
-        "padding_bottom": 36
+        "section_title": "Tisso vision in the wild"
       }
     }
   },
   "order": [
-    "featured_collection"
+    "tisso_product_grid_UR9w6D"
   ]
 }
