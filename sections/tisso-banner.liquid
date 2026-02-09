@@ -1,5 +1,6 @@
 {% comment %}
   Tisso Banner Frames Section
+  Three seamless frames without borders
   Frame 1: Top - Product flatlay
   Frame 2: Bottom right - Product details
   Frame 3: Bottom left - Gift Guide CTA
@@ -22,13 +23,17 @@
     margin: 0 auto;
   }
 
-  /* Frame 1 - No border (spans full width at top) */
+  /* Frame 1 - No border */
+  /* Desktop: 1440px width x 390px height */
   .tisso-frame-1 {
     grid-column: 1 / -1;
-    padding: {{ section.settings.frame_padding }}px;
+    padding: 0;
     background-color: {{ section.settings.frame1_bg_color }};
     overflow: hidden;
     position: relative;
+    width: 100%;
+    max-width: 1440px;
+    height: 390px;
   }
 
   /* Frame 3 - No border (bottom left - Gift Guide) */
@@ -40,32 +45,43 @@
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-    min-height: 300px;
+    min-height: 402px;
   }
 
   /* Frame 2 - No border (bottom right - Product details) */
+  /* Desktop: 890px width x 402px height */
   .tisso-frame-2 {
     grid-column: 2;
-    padding: {{ section.settings.frame_padding }}px;
+    padding: 0;
     background-color: {{ section.settings.frame2_bg_color }};
     overflow: hidden;
     position: relative;
-    
+    width: 100%;
+    max-width: 890px;
+    height: 402px;
   }
 
   /* Frame content styling */
   .frame-image {
     width: 100%;
-    height: auto;
+    height: 100%;
     display: block;
     object-fit: cover;
+    object-position: center;
+  }
+
+  .tisso-frame-1 .frame-image {
+    height: 390px;
+  }
+
+  .tisso-frame-2 .frame-image {
+    height: 402px;
   }
 
   .frame-3-content {
     z-index: 2;
     position: relative;
   }
-
 
   .frame-3-title {
     font-size: {{ section.settings.frame3_title_size }}px;
@@ -101,34 +117,14 @@
     border-radius: {{ section.settings.button_border_radius }}px;
     border: none;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
     position: relative;
-    overflow: hidden;
-  }
-
-  .tisso-cta-button::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background-color: {{ section.settings.button_hover_bg_color }};
-    transform: translate(-50%, -50%);
-    transition: width 0.4s ease, height 0.4s ease;
-    z-index: -1;
   }
 
   .tisso-cta-button:hover {
+    background-color: {{ section.settings.button_hover_bg_color }};
     color: {{ section.settings.button_hover_text_color }};
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-
-  .tisso-cta-button:hover::before {
-    width: 300px;
-    height: 300px;
   }
 
   .button-arrow {
@@ -147,13 +143,23 @@
       grid-template-rows: auto;
     }
 
+    /* Frame 1 - Full width on mobile */
     .tisso-frame-1 {
       grid-column: 1;
+      width: 100%;
+      height: auto;
+      min-height: 300px;
     }
 
+    .tisso-frame-1 .frame-image {
+      height: auto;
+      min-height: 300px;
+    }
+
+    /* Hide Frame 2 and Frame 3 on mobile */
     .tisso-frame-2,
     .tisso-frame-3 {
-      grid-column: 1;
+      display: none;
     }
 
     .frame-3-description {
@@ -197,7 +203,7 @@
 <div class="tisso-banner-container" id="tisso-banner-{{ section.id }}">
   <div class="tisso-frames-wrapper">
     
-    {% comment %} Frame 1 - Top  {% endcomment %}
+    {% comment %} Frame 1 - Top (No Border) {% endcomment %}
     <div class="tisso-frame-1 tisso-animate-fade-in" data-animation-delay="0">
       {% if section.settings.frame1_image %}
         <img 
@@ -213,7 +219,7 @@
       {% endif %}
     </div>
 
-    {% comment %} Frame 3 - Bottom Left  {% endcomment %}
+    {% comment %} Frame 3 - Bottom Left (Gift Guide - No Border) {% endcomment %}
     <div class="tisso-frame-3 tisso-animate-fade-in" data-animation-delay="200">
       <div class="frame-3-content">
         {% if section.settings.frame3_title != blank %}
@@ -233,7 +239,7 @@
       </div>
     </div>
 
-    {% comment %} Frame 2 - Bottom Right  {% endcomment %}
+    {% comment %} Frame 2 - Bottom Right (No Border) {% endcomment %}
     <div class="tisso-frame-2 tisso-animate-fade-in" data-animation-delay="400">
       {% if section.settings.frame2_image %}
         <img 
@@ -319,45 +325,6 @@
       animatedElements.forEach(function(element) {
         observer.observe(element);
       });
-
-      // Button ripple effect on click
-      const ctaButton = bannerContainer.querySelector('.tisso-cta-button');
-      if (ctaButton) {
-        ctaButton.addEventListener('click', function(e) {
-          // Create ripple element
-          const ripple = document.createElement('span');
-          ripple.style.position = 'absolute';
-          ripple.style.borderRadius = '50%';
-          ripple.style.background = 'rgba(255, 255, 255, 0.6)';
-          ripple.style.width = '20px';
-          ripple.style.height = '20px';
-          ripple.style.pointerEvents = 'none';
-          
-          // Position ripple at click location
-          const rect = this.getBoundingClientRect();
-          const x = e.clientX - rect.left - 10;
-          const y = e.clientY - rect.top - 10;
-          
-          ripple.style.left = x + 'px';
-          ripple.style.top = y + 'px';
-          ripple.style.transform = 'scale(0)';
-          ripple.style.opacity = '1';
-          ripple.style.transition = 'transform 0.6s ease, opacity 0.6s ease';
-          
-          this.appendChild(ripple);
-          
-          // Animate ripple
-          setTimeout(function() {
-            ripple.style.transform = 'scale(10)';
-            ripple.style.opacity = '0';
-          }, 10);
-          
-          // Remove ripple after animation
-          setTimeout(function() {
-            ripple.remove();
-          }, 600);
-        });
-      }
     }
   })();
 </script>
@@ -543,25 +510,29 @@
       "type": "color",
       "id": "button_bg_color",
       "label": "Button Background Color",
-      "default": "#000000"
+      "default": "#FFF544",
+      "info": "Default: Yellow (#FFF544)"
     },
     {
       "type": "color",
       "id": "button_text_color",
       "label": "Button Text Color",
-      "default": "#ffffff"
+      "default": "#000000",
+      "info": "Default: Black"
     },
     {
       "type": "color",
       "id": "button_hover_bg_color",
       "label": "Button Hover Background Color",
-      "default": "#FFF544"
+      "default": "#000000",
+      "info": "Default: Black - appears on hover"
     },
     {
       "type": "color",
       "id": "button_hover_text_color",
       "label": "Button Hover Text Color",
-      "default": "#000000"
+      "default": "#ffffff",
+      "info": "Default: White - appears on hover"
     },
     {
       "type": "range",
