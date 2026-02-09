@@ -591,34 +591,39 @@ Dynamically renders variants, adds to cart, auto-adds Soft Winter Jacket for Bla
   }
 
   // === UPDATE SELECTED VARIANT ===
-  function updateVariant(product) {
-    console.log('Updating variant with options:', selectedOptions);
-    
-    const variant = product.variants.find(function(v) {
-      return v.options.every(function(optionValue, idx) {
-        return optionValue === selectedOptions[idx];
-      });
-    });
-    
-    if (variant) {
-      selectedVariantId = variant.id;
-      popupPrice.textContent = formatPrice(variant.price);
-      console.log('New variant selected:', selectedVariantId, variant.title);
+    function updateVariant(product) {
+      console.log('Updating variant with options:', selectedOptions);
+      console.log('Selected option values:', Object.values(selectedOptions));
       
-      if (!variant.available) {
-        addToCartBtn.disabled = true;
-        addToCartBtn.innerHTML = 'SOLD OUT';
-      } else {
-        addToCartBtn.disabled = false;
-        addToCartBtn.innerHTML = 'ADD TO CART <span class="arrow">⟶</span>';
+      // Log each option individually
+      Object.keys(selectedOptions).forEach(key => {
+        console.log(`Option ${key}: "${selectedOptions[key]}"`);
+      });
+      
+      const variant = product.variants.find(function(v) {
+        return v.options.every(function(optionValue, idx) {
+          return optionValue === selectedOptions[idx];
+        });
+      });
+      
+      if (variant) {
+        selectedVariantId = variant.id;
+        popupPrice.textContent = formatPrice(variant.price);
+        console.log('New variant selected:', selectedVariantId, variant.title);
+        console.log('Variant options:', variant.options);
+        
+        if (!variant.available) {
+          addToCartBtn.disabled = true;
+          addToCartBtn.innerHTML = 'SOLD OUT';
+        } else {
+          addToCartBtn.disabled = false;
+          addToCartBtn.innerHTML = 'ADD TO CART <span class="arrow">⟶</span>';
+        }
       }
     }
-  }
 
-  // === ADD TO CART ===
-  
-
-function addToCart() {
+   // === ADD TO CART ===
+  function addToCart() {
     if (!selectedVariantId) {
       showMessage('Please select options', 'error');
       return;
@@ -629,7 +634,26 @@ function addToCart() {
     hideMessage();
     
     console.log('Adding to cart, variant ID:', selectedVariantId);
+    console.log('Selected options:', selectedOptions);
+    console.log('Current product data:', currentProductData);
     
+    // Check for Black + Medium before adding to cart
+    const selectedOptionValues = Object.values(selectedOptions);
+    console.log('Selected option values:', selectedOptionValues);
+    
+    // Convert all option values to lowercase for comparison
+    const optionValuesLower = selectedOptionValues.map(opt => 
+      opt ? opt.toString().toLowerCase().trim() : ''
+    );
+    
+    console.log('Lowercase option values:', optionValuesLower);
+    
+    const hasBlack = optionValuesLower.includes('black');
+    const hasMedium = optionValuesLower.includes('medium');
+    
+    console.log('Black + Medium check:', { hasBlack, hasMedium, optionValuesLower });
+    
+    // Add the main product first
     fetch('/cart/add.js', {
       method: 'POST',
       headers: {
@@ -645,32 +669,65 @@ function addToCart() {
       return response.json();
     })
     .then(function(data) {
-      console.log('Added to cart successfully:', data);
+      console.log('Main product added to cart:', data);
       
-      // Check for Black + Medium auto-add
-      const hasBlack = Object.values(selectedOptions).some(function(opt) {
-        return opt && opt.toLowerCase() === 'black';
-      });
-      const hasMedium = Object.values(selectedOptions).some(function(opt) {
-        return opt && opt.toLowerCase() === 'medium';
-      });
-      
-      console.log('Checking Black + Medium:', { hasBlack, hasMedium, selectedOptions });
-      
+      // If Black + Medium, add the Soft Winter Jacket
       if (hasBlack && hasMedium) {
-        console.log('✅ Black + Medium detected, adding Soft Winter Jacket');
-        return addSoftWinterJacket().then(function() {
-          // Event already dispatched in addSoftWinterJacket
-          return new Promise(resolve => setTimeout(resolve, 100));
+        console.log('✅ BLACK + MEDIUM DETECTED! Adding Soft Winter Jacket...');
+        showMessage('Added to cart! Adding bonus item...', 'success');
+        
+        // Add Soft Winter Jacket after a short delay
+        return new Promise(resolve => {
+          setTimeout(() => {
+            addSoftWinterJacket()
+              .then(() => {
+                console.log('✅ Soft Winter Jacket added successfully');
+                showMessage('Added to cart! Bonus item included!', 'success');
+                
+                // Dispatch cart update event
+                const event = new CustomEvent('tisso:cart-updated', {
+                  detail: { 
+                    product: currentProductHandle,
+                    variant: selectedVariantId,
+                    bonusAdded: true
+                  }
+                });
+                document.dispatchEvent(event);
+                console.log('Dispatched tisso:cart-updated event with bonus');
+                
+                // Close popup after a delay
+                setTimeout(closePopup, 2000);
+                resolve();
+              })
+              .catch(error => {
+                console.error('Error adding bonus item:', error);
+                showMessage('Added to cart! (Bonus item failed)', 'success');
+                
+                // Still dispatch event even if bonus failed
+                const event = new CustomEvent('tisso:cart-updated', {
+                  detail: { 
+                    product: currentProductHandle,
+                    variant: selectedVariantId,
+                    bonusAdded: false
+                  }
+                });
+                document.dispatchEvent(event);
+                
+                setTimeout(closePopup, 1500);
+                resolve();
+              });
+          }, 500);
         });
       } else {
+        // No Black + Medium, just show success
         showMessage('Added to cart!', 'success');
         
         // Dispatch cart update event
         const event = new CustomEvent('tisso:cart-updated', {
           detail: { 
             product: currentProductHandle,
-            variant: selectedVariantId 
+            variant: selectedVariantId,
+            bonusAdded: false
           }
         });
         document.dispatchEvent(event);
@@ -682,11 +739,12 @@ function addToCart() {
       }
     })
     .then(function() {
-      // Trigger Shopify cart update event
+      // Refresh the cart globally
       return fetch('/cart.js')
         .then(function(res) { return res.json(); })
         .then(function(cart) {
           document.dispatchEvent(new CustomEvent('cart:updated', { detail: cart }));
+          console.log('Shopify cart updated event dispatched');
         });
     })
     .catch(function(error) {
