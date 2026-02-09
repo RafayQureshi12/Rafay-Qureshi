@@ -1,0 +1,356 @@
+{% comment %}
+Tisso Cart Drawer - Include this snippet anywhere in your theme
+{% endcomment %}
+
+<div id="tisso-cart-drawer" class="tisso-cart-drawer">
+  <!-- Overlay -->
+  <div class="tisso-cart-drawer__overlay"></div>
+
+  <!-- Drawer -->
+  <div class="tisso-cart-drawer__panel">
+    <div class="tisso-cart-drawer__header">
+      <h2 class="tisso-cart-drawer__title">Your Cart</h2>
+      <button class="tisso-cart-drawer__close" id="tisso-cart-close">✕</button>
+    </div>
+
+    <div class="tisso-cart-drawer__items" id="tisso-cart-items">
+      <!-- Cart items will be loaded here -->
+      <div class="tisso-cart-empty">
+        <p>Your cart is empty</p>
+      </div>
+    </div>
+
+    <div class="tisso-cart-drawer__footer">
+      <div class="tisso-cart-drawer__total">
+        <span>Total:</span>
+        <span class="tisso-cart-drawer__price" id="tisso-cart-total">€0.00</span>
+      </div>
+      <a href="/checkout" class="tisso-cart-drawer__checkout">Checkout</a>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Cart Drawer Styles */
+.tisso-cart-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.tisso-cart-drawer.active {
+  pointer-events: all;
+  opacity: 1;
+}
+
+/* Overlay */
+.tisso-cart-drawer__overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.tisso-cart-drawer.active .tisso-cart-drawer__overlay {
+  opacity: 1;
+}
+
+/* Panel */
+.tisso-cart-drawer__panel {
+  position: absolute;
+  top: 0;
+  right: -400px;
+  width: 100%;
+  max-width: 400px;
+  height: 100%;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: -2px 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.tisso-cart-drawer.active .tisso-cart-drawer__panel {
+  right: 0;
+}
+
+/* Header */
+.tisso-cart-drawer__header {
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tisso-cart-drawer__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.tisso-cart-drawer__close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000;
+}
+
+/* Items */
+.tisso-cart-drawer__items {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.tisso-cart-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+/* Cart Item */
+.tisso-cart-item {
+  display: flex;
+  gap: 15px;
+  padding: 15px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.tisso-cart-item:last-child {
+  border-bottom: none;
+}
+
+.tisso-cart-item__image {
+  width: 80px;
+  height: 100px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.tisso-cart-item__details {
+  flex: 1;
+}
+
+.tisso-cart-item__title {
+  font-weight: 600;
+  font-size: 14px;
+  margin: 0 0 5px 0;
+}
+
+.tisso-cart-item__variant {
+  color: #666;
+  font-size: 13px;
+  margin: 0 0 5px 0;
+}
+
+.tisso-cart-item__quantity {
+  font-size: 13px;
+  margin: 0 0 5px 0;
+}
+
+.tisso-cart-item__price {
+  font-weight: 600;
+  font-size: 14px;
+  margin: 8px 0 0 0;
+}
+
+/* Footer */
+.tisso-cart-drawer__footer {
+  padding: 20px;
+  border-top: 1px solid #eee;
+}
+
+.tisso-cart-drawer__total {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+.tisso-cart-drawer__price {
+  font-weight: 600;
+}
+
+.tisso-cart-drawer__checkout {
+  display: block;
+  width: 100%;
+  background: #000;
+  color: #fff;
+  text-align: center;
+  padding: 15px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.tisso-cart-drawer__checkout:hover {
+  background: #333;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .tisso-cart-drawer__panel {
+    max-width: 100%;
+    right: -100%;
+  }
+  
+  .tisso-cart-drawer.active .tisso-cart-drawer__panel {
+    right: 0;
+  }
+}
+</style>
+
+<script>
+// Tisso Cart Drawer Script
+(function() {
+  'use strict';
+  
+  console.log('🛒 Tisso Cart Drawer Loading...');
+  
+  // Initialize cart
+  function initCart() {
+    const cartDrawer = document.getElementById('tisso-cart-drawer');
+    
+    if (!cartDrawer) {
+      console.error('Cart drawer element not found!');
+      return;
+    }
+    
+    console.log('Cart drawer found, initializing...');
+    
+    const closeBtn = document.getElementById('tisso-cart-close');
+    const overlay = cartDrawer.querySelector('.tisso-cart-drawer__overlay');
+    
+    // Open cart function
+    window.openTissoCart = function() {
+      console.log('Opening cart...');
+      cartDrawer.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      loadCart();
+    };
+    
+    // Close cart function
+    function closeCart() {
+      console.log('Closing cart...');
+      cartDrawer.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+    
+    // Event listeners
+    if (closeBtn) {
+      closeBtn.addEventListener('click', closeCart);
+    }
+    
+    if (overlay) {
+      overlay.addEventListener('click', closeCart);
+    }
+    
+    // Escape key to close
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && cartDrawer.classList.contains('active')) {
+        closeCart();
+      }
+    });
+    
+    // Load cart data
+    async function loadCart() {
+      console.log('Loading cart data...');
+      const itemsEl = document.getElementById('tisso-cart-items');
+      const totalEl = document.getElementById('tisso-cart-total');
+      
+      try {
+        const response = await fetch('/cart.js');
+        const cart = await response.json();
+        
+        // Update total
+        if (totalEl) {
+          totalEl.textContent = '€' + (cart.total_price / 100).toFixed(2);
+        }
+        
+        // Update items
+        if (itemsEl) {
+          if (!cart.items || cart.items.length === 0) {
+            itemsEl.innerHTML = '<div class="tisso-cart-empty"><p>Your cart is empty</p></div>';
+            return;
+          }
+          
+          let itemsHTML = '';
+          
+          cart.items.forEach(item => {
+            const imageUrl = item.image || '//cdn.shopify.com/s/files/1/placeholder_120x.png?height=100&width=80';
+            
+            itemsHTML += `
+              <div class="tisso-cart-item">
+                <img src="${imageUrl}" alt="${item.title}" class="tisso-cart-item__image">
+                <div class="tisso-cart-item__details">
+                  <p class="tisso-cart-item__title">${item.product_title}</p>
+                  <p class="tisso-cart-item__variant">${item.variant_title || 'Default'}</p>
+                  <p class="tisso-cart-item__quantity">Quantity: ${item.quantity}</p>
+                  <p class="tisso-cart-item__price">€${(item.line_price / 100).toFixed(2)}</p>
+                </div>
+              </div>
+            `;
+          });
+          
+          itemsEl.innerHTML = itemsHTML;
+        }
+        
+      } catch (error) {
+        console.error('Error loading cart:', error);
+        if (itemsEl) {
+          itemsEl.innerHTML = '<div class="tisso-cart-empty"><p>Error loading cart</p></div>';
+        }
+      }
+    }
+    
+    // Listen for cart update events
+    document.addEventListener('tisso:cart-updated', function(e) {
+      console.log('Received tisso:cart-updated event', e);
+      openTissoCart();
+    });
+    
+    // Also listen to Shopify events
+    document.addEventListener('cart:updated', function(e) {
+      console.log('Received Shopify cart:updated event', e);
+      openTissoCart();
+    });
+    
+    // Make cart functions globally available
+    window.tissoCart = {
+      open: window.openTissoCart,
+      close: closeCart,
+      refresh: loadCart
+    };
+    
+    console.log('Tisso Cart Drawer Initialized');
+  }
+  
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCart);
+  } else {
+    initCart();
+  }
+})();
+</script>

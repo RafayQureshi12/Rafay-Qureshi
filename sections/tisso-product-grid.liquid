@@ -657,19 +657,28 @@ Dynamically renders variants, adds to cart, auto-adds Soft Winter Jacket for Bla
       
       if (hasBlack && hasMedium) {
         console.log('Black + Medium detected, adding Soft Winter Jacket');
-        return addSoftWinterJacket();
+        return addSoftWinterJacket().then(function() {
+          // Event will be dispatched from addSoftWinterJacket
+        });
       } else {
         showMessage('Added to cart!', 'success');
         
-        // Dispatch cart updated event for regular items too
-        const event = new CustomEvent('tisso:cart-updated', {
-          detail: { from: 'main-product' }
-        });
-        document.dispatchEvent(event);
-        
-        setTimeout(closePopup, 1500);
+        // Dispatch cart update event
+        setTimeout(function() {
+          const event = new CustomEvent('tisso:cart-updated', {
+            detail: { 
+              product: currentProductHandle,
+              variant: selectedVariantId 
+            }
+          });
+          document.dispatchEvent(event);
+          console.log('Dispatched tisso:cart-updated event');
+          
+          closePopup();
+        }, 500);
       }
     })
+
     .then(function() {
       // Trigger cart refresh events
       if (typeof Shopify !== 'undefined' && Shopify.theme && Shopify.theme.cartRefresh) {
