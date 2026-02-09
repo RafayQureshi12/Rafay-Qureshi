@@ -227,7 +227,9 @@
 
     /* Remove forced height hack */
     .tisso-frames-wrapper::after {
-      content: none;
+      content: '';
+      display: block;
+      height: 450px;
     }
   }
 
@@ -236,7 +238,7 @@
     text-align: center;
     padding: {{ section.settings.bottom_text_padding }}px 20px;
     background-color: {{ section.settings.bottom_text_bg_color }};
-    margin-top: 20px;
+    margin-top: 10px;
   }
 
   .bottom-text {
