@@ -36,6 +36,10 @@ Tisso Product Grid - Fixed Version
     <button class="tisso-popup__close" id="closePopup" aria-label="Close">×</button>
     
     <div class="tisso-popup__content">
+      <div class="tisso-popup__image-wrapper">
+        <img id="popupImage" class="tisso-popup__image" src="" alt="">
+      </div>
+      
       <h3 class="tisso-popup__title" id="popupTitle"></h3>
       <p class="tisso-popup__price" id="popupPrice"></p>
       <p class="tisso-popup__description" id="popupDescription"></p>
@@ -151,7 +155,7 @@ Tisso Product Grid - Fixed Version
 /* === POPUP CONTENT === */
 .tisso-popup {
   background: white;
-  padding: 40px;
+  padding: 30px;
   max-width: 450px;
   width: 100%;
   position: relative;
@@ -161,23 +165,45 @@ Tisso Product Grid - Fixed Version
   margin: auto;
 }
 
+.tisso-popup__image-wrapper {
+  width: 100%;
+  margin-bottom: 20px;
+  background: #f5f5f5;
+  overflow: hidden;
+}
+
+.tisso-popup__image {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
 .tisso-popup__close {
   position: absolute;
-  top: 15px;
-  right: 15px;
-  background: none;
+  top: 10px;
+  right: 10px;
+  background: white;
   border: none;
-  font-size: 32px;
+  font-size: 28px;
   cursor: pointer;
-  color: #666;
+  color: #333;
   line-height: 1;
   padding: 5px 10px;
   transition: color 0.3s ease;
-  z-index: 1;
+  z-index: 10;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .tisso-popup__close:hover {
   color: #000;
+  background: #f5f5f5;
 }
 
 .tisso-popup__content {
@@ -212,25 +238,30 @@ Tisso Product Grid - Fixed Version
 }
 
 .tisso-variant-group {
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .tisso-variant-label {
   display: block;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   color: #333;
 }
 
 .tisso-variant-select {
   width: 100%;
-  padding: 10px 12px;
+  padding: 12px 15px;
   font-size: 14px;
   border: 1px solid #ddd;
   background: white;
   cursor: pointer;
   transition: border-color 0.3s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23333' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  padding-right: 40px;
 }
 
 .tisso-variant-select:hover,
@@ -239,34 +270,34 @@ Tisso Product Grid - Fixed Version
   outline: none;
 }
 
-/* === COLOR SWATCHES (if needed) === */
+/* === COLOR TOGGLE BUTTONS === */
 .tisso-color-options {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 
 .tisso-color-option {
-  width: 40px;
-  height: 40px;
-  border: 2px solid #ddd;
+  padding: 12px 20px;
+  border: 1px solid #ddd;
+  background: white;
   cursor: pointer;
   transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: 600;
-  background: white;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  color: #333;
 }
 
 .tisso-color-option.selected {
   border-color: #000;
-  border-width: 2px;
+  background: #000;
+  color: white;
 }
 
-.tisso-color-option:hover {
+.tisso-color-option:hover:not(.selected) {
   border-color: #666;
+  background: #f5f5f5;
 }
 
 /* === ADD TO CART BUTTON === */
@@ -327,7 +358,7 @@ Tisso Product Grid - Fixed Version
   }
 
   .tisso-popup {
-    padding: 30px 20px;
+    padding: 20px;
     max-width: 95%;
   }
 
@@ -338,6 +369,10 @@ Tisso Product Grid - Fixed Version
   .tisso-popup__price {
     font-size: 16px;
   }
+  
+  .tisso-popup__description {
+    font-size: 12px;
+  }
 
   .tisso-grid__dot {
     width: 28px;
@@ -346,6 +381,15 @@ Tisso Product Grid - Fixed Version
 
   .tisso-grid__dot::before {
     font-size: 20px;
+  }
+  
+  .tisso-color-options {
+    gap: 8px;
+  }
+  
+  .tisso-color-option {
+    padding: 10px 15px;
+    font-size: 13px;
   }
 }
 </style>
@@ -374,6 +418,7 @@ Tisso Product Grid - Fixed Version
   const popupPrice = document.getElementById('popupPrice');
   const popupDescription = document.getElementById('popupDescription');
   const popupVariants = document.getElementById('popupVariants');
+  const popupImage = document.getElementById('popupImage');
 
   // === INITIALIZE DOT BUTTONS ===
   function initButtons() {
@@ -441,6 +486,12 @@ Tisso Product Grid - Fixed Version
     popupPrice.textContent = formatPrice(product.price);
     popupDescription.textContent = stripHtml(product.description);
     
+    // Update product image
+    if (product.featured_image) {
+      popupImage.src = product.featured_image;
+      popupImage.alt = product.title;
+    }
+    
     // Clear previous variants
     popupVariants.innerHTML = '';
     selectedOptions = {};
@@ -453,13 +504,20 @@ Tisso Product Grid - Fixed Version
     }
     
     // Set first variant as default
-    selectedVariantId = product.variants[0].id;
+    const firstAvailableVariant = product.variants.find(v => v.available) || product.variants[0];
+    selectedVariantId = firstAvailableVariant.id;
+    
+    // Initialize selected options with first variant's options
+    firstAvailableVariant.options.forEach(function(optionValue, idx) {
+      selectedOptions[idx] = optionValue;
+    });
     
     // Render variant options
     if (product.options && product.options.length > 0) {
       product.options.forEach(function(option, index) {
-        if (option.values && option.values.length > 1) {
-          renderVariantOption(option, index, product);
+        // Only show options that have more than one value OR if it's not "Default Title"
+        if (option.name !== 'Title' && option.values && option.values.length > 0) {
+          renderVariantOption(option, index, product, firstAvailableVariant);
         }
       });
     }
@@ -468,60 +526,66 @@ Tisso Product Grid - Fixed Version
   }
 
   // === RENDER VARIANT OPTION ===
-  function renderVariantOption(option, optionIndex, product) {
+  function renderVariantOption(option, optionIndex, product, firstVariant) {
     const variantGroup = document.createElement('div');
     variantGroup.className = 'tisso-variant-group';
     
     const label = document.createElement('label');
     label.className = 'tisso-variant-label';
-    label.textContent = option.name + ':';
+    label.textContent = option.name;
     
-    // For Color option, use color swatches
-    if (option.name.toLowerCase() === 'color') {
+    // Check if this is Color option - use toggle buttons
+    const isColorOption = option.name.toLowerCase() === 'color' || option.name.toLowerCase() === 'colour';
+    
+    if (isColorOption) {
+      // Color toggle buttons
       const colorContainer = document.createElement('div');
       colorContainer.className = 'tisso-color-options';
       
       option.values.forEach(function(value) {
-        const colorOption = document.createElement('button');
-        colorOption.className = 'tisso-color-option';
-        colorOption.textContent = value;
-        colorOption.setAttribute('data-value', value);
+        const colorButton = document.createElement('button');
+        colorButton.className = 'tisso-color-option';
+        colorButton.textContent = value;
+        colorButton.type = 'button';
         
-        if (optionIndex === 0) {
-          colorOption.classList.add('selected');
-          selectedOptions[optionIndex] = value;
+        // Set initial selection
+        if (value === selectedOptions[optionIndex]) {
+          colorButton.classList.add('selected');
         }
         
-        colorOption.addEventListener('click', function(e) {
+        colorButton.addEventListener('click', function(e) {
           e.preventDefault();
-          // Remove selected from siblings
+          // Remove selected from all buttons
           colorContainer.querySelectorAll('.tisso-color-option').forEach(function(btn) {
             btn.classList.remove('selected');
           });
+          // Add selected to clicked button
           this.classList.add('selected');
           selectedOptions[optionIndex] = value;
           updateVariant(product);
         });
         
-        colorContainer.appendChild(colorOption);
+        colorContainer.appendChild(colorButton);
       });
       
       variantGroup.appendChild(label);
       variantGroup.appendChild(colorContainer);
     } else {
-      // Regular dropdown for other options
+      // Dropdown for other options (Size, etc.)
       const select = document.createElement('select');
       select.className = 'tisso-variant-select';
       
-      option.values.forEach(function(value, i) {
+      option.values.forEach(function(value) {
         const opt = document.createElement('option');
         opt.value = value;
         opt.textContent = value;
-        select.appendChild(opt);
         
-        if (i === 0) {
-          selectedOptions[optionIndex] = value;
+        // Set initial selection
+        if (value === selectedOptions[optionIndex]) {
+          opt.selected = true;
         }
+        
+        select.appendChild(opt);
       });
       
       select.addEventListener('change', function() {
