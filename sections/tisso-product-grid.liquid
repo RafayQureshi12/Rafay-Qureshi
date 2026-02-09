@@ -404,13 +404,15 @@ Dynamically renders variants, adds to cart, auto-adds Soft Winter Jacket for Bla
 (function() {
   'use strict';
 
+  // === CONFIGURATION - ADD YOUR SOFT WINTER JACKET VARIANT ID HERE ===
+  // IMPORTANT: Replace this with the actual variant ID of your Soft Winter Jacket
   const SOFT_WINTER_JACKET_VARIANT_ID = 10165025308993;
   // To find the variant ID:
   // 1. Go to your Shopify admin > Products > Soft Winter Jacket
   // 2. Click on the variant you want to add
   // 3. Look at the URL - it will be something like: /admin/products/1234567890/variants/9876543210
   // 4. The number after /variants/ is your variant ID (e.g., 9876543210)
-  // 5. Replace the text above with that number
+  // 5. Replace the number above with that variant ID
   
   // === DOM ELEMENTS ===
   const popup = document.getElementById('tissoPopup');
@@ -760,13 +762,7 @@ Dynamically renders variants, adds to cart, auto-adds Soft Winter Jacket for Bla
   // === ADD SOFT WINTER JACKET ===
   function addSoftWinterJacket() {
     console.log('Attempting to add Soft Winter Jacket with variant ID:', SOFT_WINTER_JACKET_VARIANT_ID);
-    
-    // Validate that the variant ID has been set
-    if (SOFT_WINTER_JACKET_VARIANT_ID === 'YOUR_SOFT_WINTER_JACKET_VARIANT_ID_HERE') {
-      console.error('ERROR: SOFT_WINTER_JACKET_VARIANT_ID is not configured!');
-      console.error('Please update the variant ID at the top of the script section.');
-      return Promise.reject(new Error('Variant ID not configured'));
-    }
+    console.log('Variant ID type:', typeof SOFT_WINTER_JACKET_VARIANT_ID);
     
     return fetch('/cart/add.js', {
       method: 'POST',
@@ -779,12 +775,47 @@ Dynamically renders variants, adds to cart, auto-adds Soft Winter Jacket for Bla
       })
     })
     .then(function(response) {
-      if (!response.ok) throw new Error('Failed to add bonus item');
-      return response.json();
+      console.log('Response status:', response.status);
+      
+      // Get the response body for error details
+      return response.json().then(function(data) {
+        console.log('Response data:', data);
+        
+        if (!response.ok) {
+          console.error('❌ Failed to add Soft Winter Jacket. Status:', response.status);
+          console.error('Full response:', data);
+          
+          // Provide helpful error messages
+          if (response.status === 422) {
+            console.error('=== 422 ERROR DETAILS ===');
+            console.error('Description:', data.description);
+            console.error('Message:', data.message);
+            console.error('Status:', data.status);
+            
+            if (data.description && data.description.includes('out of stock')) {
+              console.error('🔴 REASON: The Soft Winter Jacket variant is OUT OF STOCK');
+              console.error('👉 Go to Shopify Admin > Products > Soft Winter Jacket and increase inventory');
+            } else if (data.description && data.description.includes('not found')) {
+              console.error('🔴 REASON: Variant ID', SOFT_WINTER_JACKET_VARIANT_ID, 'does not exist');
+              console.error('👉 Verify the variant ID is correct');
+            } else {
+              console.error('🔴 REASON: Unknown - Full error:', data);
+              console.error('👉 Check variant availability and inventory in Shopify Admin');
+            }
+          }
+          
+          throw new Error(data.description || data.message || 'Failed to add bonus item');
+        }
+        return data;
+      });
     })
     .then(function(data) {
-      console.log('Soft Winter Jacket added successfully:', data);
+      console.log('✅ Soft Winter Jacket added successfully:', data);
       return data;
+    })
+    .catch(function(error) {
+      console.error('Catch block error:', error);
+      throw error;
     });
   }
 
