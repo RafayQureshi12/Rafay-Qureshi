@@ -1,5 +1,5 @@
 {% comment %}
-Tisso Product Grid - Combined Version
+Tisso Product Grid - Exact Design Match
 {% endcomment %}
 
 <section class="tisso-grid">
@@ -33,20 +33,26 @@ Tisso Product Grid - Combined Version
 <!-- Popup Modal -->
 <div class="tisso-popup-overlay" id="tissoPopup">
   <div class="tisso-popup">
+    <button class="tisso-popup__close" id="closePopup" aria-label="Close">×</button>
+    
     <div class="tisso-popup__content">
-      <div class="tisso-popup__layout">
-        <div class="tisso-popup__left">
-          <img id="popupImage" class="tisso-popup__image" src="" alt="">
-        </div>
-        <div class="tisso-popup__right">
-          <button class="tisso-popup__close" id="closePopup" aria-label="Close">×</button>
-          <h3 class="tisso-popup__title" id="popupTitle"></h3>
-          <p class="tisso-popup__price" id="popupPrice"></p>
-          <p class="tisso-popup__description" id="popupDescription"></p>
-          <div class="tisso-popup__variants" id="popupVariants"></div>
-          <button class="tisso-popup__add-to-cart" id="addToCart">ADD TO CART →</button>
-          <div class="tisso-popup__message" id="cartMessage"></div>
-        </div>
+      <div class="tisso-popup__image-wrapper">
+        <img id="popupImage" class="tisso-popup__image" src="" alt="">
+      </div>
+      
+      <div class="tisso-popup__details">
+        <h3 class="tisso-popup__title" id="popupTitle"></h3>
+        <p class="tisso-popup__price" id="popupPrice"></p>
+        <p class="tisso-popup__description" id="popupDescription"></p>
+        
+        <div class="tisso-popup__variants" id="popupVariants"></div>
+        
+        <button class="tisso-popup__add-to-cart" id="addToCart">
+          ADD TO CART
+          <span class="arrow">⟶</span>
+        </button>
+        
+        <div class="tisso-popup__message" id="cartMessage"></div>
       </div>
     </div>
   </div>
@@ -136,13 +142,12 @@ Tisso Product Grid - Combined Version
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.5);
   display: none;
   align-items: center;
   justify-content: center;
   z-index: 99999;
   padding: 20px;
-  overflow-y: auto;
 }
 
 .tisso-popup-overlay.active {
@@ -152,89 +157,78 @@ Tisso Product Grid - Combined Version
 /* === POPUP CONTENT === */
 .tisso-popup {
   background: white;
-  max-width: 720px;
+  max-width: 380px;
   width: 100%;
-  padding: 0;
   position: relative;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   max-height: 90vh;
   overflow-y: auto;
-  margin: auto;
-}
-
-.tisso-popup__layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-}
-
-.tisso-popup__left {
-  background: #f4f4f4;
-}
-
-.tisso-popup__image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.tisso-popup__right {
-  padding: 28px;
-  position: relative;
 }
 
 .tisso-popup__close {
   position: absolute;
-  right: 15px;
-  top: 10px;
-  background: white;
+  right: 12px;
+  top: 12px;
+  background: transparent;
   border: none;
-  font-size: 28px;
+  font-size: 24px;
   cursor: pointer;
-  color: #333;
+  color: #000;
   line-height: 1;
-  padding: 5px 10px;
-  transition: color 0.3s ease;
+  padding: 4px;
   z-index: 10;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .tisso-popup__close:hover {
-  color: #000;
+  opacity: 0.7;
+}
+
+.tisso-popup__image-wrapper {
+  width: 100%;
   background: #f5f5f5;
 }
 
+.tisso-popup__image {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+.tisso-popup__details {
+  padding: 24px 28px 28px;
+}
+
 .tisso-popup__title {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: #333;
-  line-height: 1.3;
+  font-size: 16px;
+  font-weight: 400;
+  margin: 0 0 4px 0;
+  color: #000;
+  line-height: 1.4;
 }
 
 .tisso-popup__price {
-  font-size: 18px;
-  font-weight: 700;
-  margin: 6px 0 10px;
+  font-size: 16px;
+  font-weight: 400;
+  margin: 0 0 12px 0;
   color: #000;
 }
 
 .tisso-popup__description {
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: 12px;
+  line-height: 1.6;
   color: #666;
-  margin-bottom: 20px;
+  margin: 0 0 20px 0;
 }
 
 /* === VARIANT SELECTORS === */
 .tisso-popup__variants {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .tisso-variant-group {
@@ -243,79 +237,99 @@ Tisso Product Grid - Combined Version
 
 .tisso-variant-label {
   display: block;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 400;
   margin-bottom: 8px;
-  color: #333;
+  color: #000;
+  text-transform: capitalize;
 }
 
 .tisso-variant-select {
   width: 100%;
-  padding: 12px 15px;
+  padding: 12px 16px;
   font-size: 14px;
-  border: 1px solid #ddd;
+  border: 1px solid #000;
   background: white;
   cursor: pointer;
-  transition: border-color 0.3s ease;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23333' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 15px center;
+  background-position: right 16px center;
   padding-right: 40px;
+  font-weight: 400;
+  color: #000;
 }
 
-.tisso-variant-select:hover,
 .tisso-variant-select:focus {
-  border-color: #333;
   outline: none;
+  border-color: #000;
 }
 
 /* === COLOR TOGGLE BUTTONS === */
 .tisso-color-options {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 0;
+  border: 1px solid #000;
 }
 
 .tisso-color-option {
   padding: 12px 20px;
-  border: 1px solid #ddd;
+  border: none;
+  border-right: 1px solid #000;
   background: white;
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 400;
   text-align: center;
-  color: #333;
+  color: #000;
+  position: relative;
+}
+
+.tisso-color-option:last-child {
+  border-right: none;
 }
 
 .tisso-color-option.selected {
-  border-color: #000;
   background: #000;
   color: white;
 }
 
 .tisso-color-option:hover:not(.selected) {
-  border-color: #666;
   background: #f5f5f5;
 }
 
 /* === ADD TO CART BUTTON === */
 .tisso-popup__add-to-cart {
   width: 100%;
-  padding: 14px 30px;
-  background: black;
+  padding: 16px 24px;
+  background: #000;
   color: white;
   border: none;
   font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 1px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
   cursor: pointer;
   transition: background 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-transform: uppercase;
+}
+
+.tisso-popup__add-to-cart .arrow {
+  font-size: 16px;
+  transition: transform 0.3s ease;
 }
 
 .tisso-popup__add-to-cart:hover:not(:disabled) {
   background: #333;
+}
+
+.tisso-popup__add-to-cart:hover:not(:disabled) .arrow {
+  transform: translateX(4px);
 }
 
 .tisso-popup__add-to-cart:disabled {
@@ -358,24 +372,11 @@ Tisso Product Grid - Combined Version
   }
 
   .tisso-popup {
-    padding: 20px;
     max-width: 95%;
   }
 
-  .tisso-popup__layout {
-    grid-template-columns: 1fr;
-  }
-
-  .tisso-popup__title {
-    font-size: 18px;
-  }
-
-  .tisso-popup__price {
-    font-size: 16px;
-  }
-  
-  .tisso-popup__description {
-    font-size: 12px;
+  .tisso-popup__details {
+    padding: 20px 24px 24px;
   }
 
   .tisso-grid__dot {
@@ -385,15 +386,6 @@ Tisso Product Grid - Combined Version
 
   .tisso-grid__dot::before {
     font-size: 20px;
-  }
-  
-  .tisso-color-options {
-    gap: 8px;
-  }
-  
-  .tisso-color-option {
-    padding: 10px 15px;
-    font-size: 13px;
   }
 }
 </style>
@@ -405,7 +397,7 @@ Tisso Product Grid - Combined Version
   console.log('Tisso Product Grid Script Loading...');
 
   // === CONFIGURATION === 
-  const SOFT_WINTER_JACKET_VARIANT_ID = 51379091996993; // UPDATE THIS!
+  const SOFT_WINTER_JACKET_VARIANT_ID = 51379091996993;
   
   // === STATE ===
   let currentProductHandle = null;
@@ -456,16 +448,13 @@ Tisso Product Grid - Combined Version
   function loadProductData(handle, basicData) {
     console.log('Loading product data for:', handle);
     
-    // Show basic info immediately
     popupTitle.textContent = basicData.title;
     popupPrice.textContent = formatPrice(basicData.price);
     popupDescription.textContent = basicData.description;
     popupVariants.innerHTML = '<p style="color: #999; font-size: 13px;">Loading variants...</p>';
     
-    // Open popup
     openPopup();
     
-    // Fetch full product data
     fetch('/products/' + handle + '.js')
       .then(function(response) {
         if (!response.ok) throw new Error('Product not found');
@@ -485,41 +474,33 @@ Tisso Product Grid - Combined Version
 
   // === DISPLAY PRODUCT DETAILS ===
   function displayProductDetails(product) {
-    // Update title, price, description
     popupTitle.textContent = product.title;
     popupPrice.textContent = formatPrice(product.price);
     popupDescription.textContent = stripHtml(product.description);
     
-    // Update product image
     if (product.featured_image) {
       popupImage.src = product.featured_image;
       popupImage.alt = product.title;
     }
     
-    // Clear previous variants
     popupVariants.innerHTML = '';
     selectedOptions = {};
     
-    // Check if product has variants
     if (!product.variants || product.variants.length === 0) {
       console.log('Product has no variants');
       selectedVariantId = product.id;
       return;
     }
     
-    // Set first variant as default
     const firstAvailableVariant = product.variants.find(function(v) { return v.available; }) || product.variants[0];
     selectedVariantId = firstAvailableVariant.id;
     
-    // Initialize selected options with first variant's options
     firstAvailableVariant.options.forEach(function(optionValue, idx) {
       selectedOptions[idx] = optionValue;
     });
     
-    // Render variant options
     if (product.options && product.options.length > 0) {
       product.options.forEach(function(option, index) {
-        // Only show options that have more than one value OR if it's not "Default Title"
         if (option.name !== 'Title' && option.values && option.values.length > 0) {
           renderVariantOption(option, index, product, firstAvailableVariant);
         }
@@ -538,11 +519,9 @@ Tisso Product Grid - Combined Version
     label.className = 'tisso-variant-label';
     label.textContent = option.name;
     
-    // Check if this is Color option - use toggle buttons
     const isColorOption = option.name.toLowerCase() === 'color' || option.name.toLowerCase() === 'colour';
     
     if (isColorOption) {
-      // Color toggle buttons
       const colorContainer = document.createElement('div');
       colorContainer.className = 'tisso-color-options';
       
@@ -552,18 +531,15 @@ Tisso Product Grid - Combined Version
         colorButton.textContent = value;
         colorButton.type = 'button';
         
-        // Set initial selection
         if (value === selectedOptions[optionIndex]) {
           colorButton.classList.add('selected');
         }
         
         colorButton.addEventListener('click', function(e) {
           e.preventDefault();
-          // Remove selected from all buttons
           colorContainer.querySelectorAll('.tisso-color-option').forEach(function(btn) {
             btn.classList.remove('selected');
           });
-          // Add selected to clicked button
           this.classList.add('selected');
           selectedOptions[optionIndex] = value;
           updateVariant(product);
@@ -575,7 +551,6 @@ Tisso Product Grid - Combined Version
       variantGroup.appendChild(label);
       variantGroup.appendChild(colorContainer);
     } else {
-      // Dropdown for other options (Size, etc.)
       const select = document.createElement('select');
       select.className = 'tisso-variant-select';
       
@@ -584,7 +559,6 @@ Tisso Product Grid - Combined Version
         opt.value = value;
         opt.textContent = value;
         
-        // Set initial selection
         if (value === selectedOptions[optionIndex]) {
           opt.selected = true;
         }
@@ -619,13 +593,12 @@ Tisso Product Grid - Combined Version
       popupPrice.textContent = formatPrice(variant.price);
       console.log('New variant selected:', selectedVariantId, variant.title);
       
-      // Check availability
       if (!variant.available) {
         addToCartBtn.disabled = true;
-        addToCartBtn.textContent = 'SOLD OUT';
+        addToCartBtn.innerHTML = 'SOLD OUT';
       } else {
         addToCartBtn.disabled = false;
-        addToCartBtn.textContent = 'ADD TO CART →';
+        addToCartBtn.innerHTML = 'ADD TO CART <span class="arrow">⟶</span>';
       }
     }
   }
@@ -638,7 +611,7 @@ Tisso Product Grid - Combined Version
     }
     
     addToCartBtn.disabled = true;
-    addToCartBtn.textContent = 'ADDING...';
+    addToCartBtn.innerHTML = 'ADDING...';
     hideMessage();
     
     console.log('Adding to cart, variant ID:', selectedVariantId);
@@ -660,7 +633,6 @@ Tisso Product Grid - Combined Version
     .then(function(data) {
       console.log('Added to cart successfully:', data);
       
-      // Check for Black + Medium auto-add
       const hasBlack = Object.values(selectedOptions).some(function(opt) {
         return opt && opt.toLowerCase() === 'black';
       });
@@ -677,7 +649,6 @@ Tisso Product Grid - Combined Version
       }
     })
     .then(function() {
-      // Trigger cart refresh
       if (typeof Shopify !== 'undefined' && Shopify.theme && Shopify.theme.cartRefresh) {
         Shopify.theme.cartRefresh();
       }
@@ -689,7 +660,7 @@ Tisso Product Grid - Combined Version
     })
     .finally(function() {
       addToCartBtn.disabled = false;
-      addToCartBtn.textContent = 'ADD TO CART →';
+      addToCartBtn.innerHTML = 'ADD TO CART <span class="arrow">⟶</span>';
     });
   }
 
