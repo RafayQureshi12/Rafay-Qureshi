@@ -643,6 +643,7 @@ Dynamically renders variants, adds to cart, auto-adds Soft Winter Jacket for Bla
       if (!response.ok) throw new Error('Failed to add to cart');
       return response.json();
     })
+
     .then(function(data) {
       console.log('Added to cart successfully:', data);
       
@@ -659,6 +660,13 @@ Dynamically renders variants, adds to cart, auto-adds Soft Winter Jacket for Bla
         return addSoftWinterJacket();
       } else {
         showMessage('Added to cart!', 'success');
+        
+        // Dispatch cart updated event for regular items too
+        const event = new CustomEvent('tisso:cart-updated', {
+          detail: { from: 'main-product' }
+        });
+        document.dispatchEvent(event);
+        
         setTimeout(closePopup, 1500);
       }
     })
@@ -689,37 +697,39 @@ Dynamically renders variants, adds to cart, auto-adds Soft Winter Jacket for Bla
   }
 
   // === ADD SOFT WINTER JACKET ===
-  function addSoftWinterJacket() {
-    return fetch('/cart/add.js', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        id: SOFT_WINTER_JACKET_VARIANT_ID,
-        quantity: 1
+    function addSoftWinterJacket() {
+      return fetch('/cart/add.js', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: SOFT_WINTER_JACKET_VARIANT_ID,
+          quantity: 1
+        })
       })
-    })
-    .then(function(response) {
-      if (!response.ok) throw new Error('Failed to add bonus item');
-      return response.json();
-    })
-    .then(function() {
-      console.log('Soft Winter Jacket added successfully');
-      try {
-        document.dispatchEvent(new Event('tisso:cart-updated'));
-      } catch (e) {
-        console.warn('Cart event failed:', e);
-      }
-      showMessage('Added to cart! Bonus item included!', 'success');
-      setTimeout(closePopup, 2000);
-    })
-    .catch(function(error) {
-      console.error('Error adding bonus item:', error);
-      showMessage('Added to cart!', 'success');
-      setTimeout(closePopup, 1500);
-    });
-  }
+      .then(function(response) {
+        if (!response.ok) throw new Error('Failed to add bonus item');
+        return response.json();
+      })
+      .then(function() {
+        console.log('Soft Winter Jacket added successfully');
+        
+        // Dispatch the cart updated event
+        const event = new CustomEvent('tisso:cart-updated', {
+          detail: { from: 'soft-winter-jacket' }
+        });
+        document.dispatchEvent(event);
+        
+        showMessage('Added to cart! Bonus item included!', 'success');
+        setTimeout(closePopup, 2000);
+      })
+      .catch(function(error) {
+        console.error('Error adding bonus item:', error);
+        showMessage('Added to cart!', 'success');
+        setTimeout(closePopup, 1500);
+      });
+    }
 
   // === POPUP CONTROLS ===
   function openPopup() {
