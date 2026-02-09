@@ -270,7 +270,10 @@ Dynamically renders variants, adds to cart, auto-adds Soft Winter Jacket for Bla
   border-color: #000;
 }
 
-/* === COLOR BUTTONS - EXACTLY LIKE REFERENCE === */
+/* === COLOR BUTTONS  === */
+
+
+
 .tisso-color-options {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -697,17 +700,17 @@ Dynamically renders variants, adds to cart, auto-adds Soft Winter Jacket for Bla
         quantity: 1
       })
     })
-      .then(() => {
-    // BOTH ITEMS ARE NOW IN CART
-    document.dispatchEvent(new Event('tisso:cart-updated'));
-  });
-}
     .then(function(response) {
       if (!response.ok) throw new Error('Failed to add bonus item');
       return response.json();
     })
     .then(function() {
       console.log('Soft Winter Jacket added successfully');
+      try {
+        document.dispatchEvent(new Event('tisso:cart-updated'));
+      } catch (e) {
+        console.warn('Cart event failed:', e);
+      }
       showMessage('Added to cart! Bonus item included!', 'success');
       setTimeout(closePopup, 2000);
     })
