@@ -1,832 +1,1069 @@
 {% comment %}
-  Tisso Banner Frames Section - Updated Version
-  - Separate mobile and desktop descriptions
-  - Separate mobile and desktop bottom text
-  - Fixed mobile image display
-  - All content editable from customizer
+Tisso Product Grid - Updated with Picture Perfect Quick Buy Popup
+Matches the Orange Wide Leg design reference
 {% endcomment %}
 
-<style>
-  .tisso-banner-container {
-    max-width: 100%;
-    margin: 0 auto;
-    padding: {{ section.settings.section_padding }}px 20px;
-    background-color: {{ section.settings.background_color }};
-  }
+<section class="tisso-grid">
+  <h2 class="tisso-grid__title">{{ section.settings.section_title }}</h2>
 
-  .tisso-frames-wrapper {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto;
-    gap: 0px;
-    max-width: 1440px;
-    margin: 0 auto;
-  }
+  <div class="tisso-grid__container">
+    {% for block in section.blocks %}
+      {% assign product = block.settings.product %}
+      {% if product %}
+        <div class="tisso-grid__item" {{ block.shopify_attributes }}>
+          <img 
+            src="{{ product.featured_image | image_url: width: 600 }}" 
+            alt="{{ product.title }}"
+            class="tisso-grid__image"
+          >
+          <button 
+            class="tisso-grid__dot" 
+            data-product-id="{{ product.id }}"
+            data-product-title="{{ product.title | escape }}"
+            data-product-price="{{ product.price }}"
+            data-product-description="{{ product.description | strip_html | escape }}"
+            data-product-handle="{{ product.handle }}"
+            aria-label="View {{ product.title }}">
+          </button>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</section>
 
-  /* Frame 3 - No border (bottom left - Gift Guide) */
-  .tisso-frame-3 {
-    grid-column: 1;
-    grid-row: 2;
-    padding: {{ section.settings.frame_padding }}px;
-    background-color: {{ section.settings.frame3_bg_color }};
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 402px;
-  }
-
-  /* Frame 1 - No border (spans full width at top) */
-  .tisso-frame-1 {
-    grid-column: 1 / -1;
-    grid-row: 1;
-    padding: 0;
-    background-color: {{ section.settings.frame1_bg_color }};
-    overflow: hidden;
-    position: relative;
-    width: 100%;
-    max-width: 1440px;
-    height: 390px;
-  }
-
-  /* Frame 2 - No border (bottom right - Product details) */
-  .tisso-frame-2 {
-    grid-column: 2;
-    grid-row: 2;
-    padding: 0;
-    background-color: {{ section.settings.frame2_bg_color }};
-    overflow: hidden;
-    position: relative;
-    width: 100%;
-    max-width: 890px;
-    height: 402px;
-  }
-
-  /* Frame content styling */
-  .frame-image {
-    width: 100%;
-    height: 100%;
-    display: block;
-    object-fit: cover;
-    object-position: center;
-  }
-
-  .tisso-frame-1 .frame-image {
-    height: 390px;
-  }
-
-  .tisso-frame-2 .frame-image {
-    height: 402px;
-  }
-
-  .frame-3-content {
-    z-index: 2;
-    position: relative;
-  }
-
-  .frame-3-title {
-    font-size: {{ section.settings.frame3_title_size }}px;
-    font-weight: {{ section.settings.frame3_title_weight }};
-    color: {{ section.settings.frame3_title_color }};
-    margin-bottom: 15px;
-    line-height: 1.2;
-  }
-
-  /* Desktop description - visible by default */
-  .frame-3-description-desktop {
-    font-size: {{ section.settings.frame3_desc_size }}px;
-    color: {{ section.settings.frame3_desc_color }};
-    margin-bottom: 25px;
-    line-height: {{ section.settings.frame3_desc_line_height }};
-    max-width: 90%;
-    display: block;
-  }
-
-  /* Mobile description - hidden by default */
-  .frame-3-description-mobile {
-    display: none;
-  }
-
-  .frame-3-description p {
-    margin: 0;
-  }
-
-  /* Button styling with hover animation */
-  .tisso-cta-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: {{ section.settings.button_padding_v }}px {{ section.settings.button_padding_h }}px;
-    background-color: {{ section.settings.button_bg_color }};
-    color: {{ section.settings.button_text_color }};
-    text-decoration: none;
-    font-size: {{ section.settings.button_font_size }}px;
-    font-weight: {{ section.settings.button_font_weight }};
-    border-radius: {{ section.settings.button_border_radius }}px;
-    border: none;
-    cursor: pointer;
-    transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
-    position: relative;
-  }
-
-  .tisso-cta-button:hover {
-    background-color: {{ section.settings.button_hover_bg_color }};
-    color: {{ section.settings.button_hover_text_color }};
-    transform: translateY(-2px);
-  }
-
-  .button-arrow {
-    transition: transform 0.3s ease;
-    font-size: 16px;
-  }
-
-  .tisso-cta-button:hover .button-arrow {
-    transform: translateX(5px);
-  }
-
-  /* ────────────────────────────────────────────────
-     MOBILE VIEW - FIXED LAYOUT + SEPARATE CONTENT
-  ──────────────────────────────────────────────── */
-  @media (max-width: 768px) {
-    .tisso-banner-container {
-      padding: 0;
-      background: white;
-    }
-
-    .tisso-frames-wrapper {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-      background: white;
-    }
-
-    /* Frame 3 - Text content at top */
-    .tisso-frame-3 {
-      order: 1;
-      background: white;
-      padding: 40px 24px 30px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      min-height: auto;
-    }
-
-    .frame-3-content {
-      max-width: 480px;
-      width: 100%;
-    }
-
-    .frame-3-title {
-      font-size: {{ section.settings.frame3_title_mobile_size }}px;
-      color: {{ section.settings.frame3_title_mobile_color }};
-      margin-bottom: 16px;
-      line-height: 1.15;
-    }
-
-    /* Hide desktop description on mobile */
-    .frame-3-description-desktop {
-      display: none;
-    }
-
-    /* Show mobile description on mobile */
-    .frame-3-description-mobile {
-      display: block;
-      font-size: {{ section.settings.frame3_desc_mobile_size }}px;
-      color: {{ section.settings.frame3_desc_mobile_color }};
-      max-width: 100%;
-      margin-bottom: 28px;
-      line-height: 1.5;
-    }
-
-    /* Frame 1 - Image below text - FIXED */
-    .tisso-frame-1 {
-      order: 2;
-      width: 100%;
-      height: auto;
-      max-width: 100%;
-      margin: 0;
-      padding: 0 20px;
-      overflow: visible;
-      background: white;
-    }
-
-    .tisso-frame-1 .frame-image {
-      width: 100%;
-      height: auto;
-      max-height: 500px;
-      object-fit: contain;
-      object-position: center;
-      display: block;
-    }
-
-    /* Hide Frame 2 on mobile */
-    .tisso-frame-2 {
-      display: none;
-    }
-
-    /* Button improvements */
-    .tisso-cta-button {
-      font-size: {{ section.settings.button_mobile_size }}px;
-      padding: {{ section.settings.button_mobile_padding_v }}px {{ section.settings.button_mobile_padding_h }}px;
-      min-width: 180px;
-      justify-content: center;
-    }
-  }
-
-  /* Bottom Text Banner */
-  .tisso-bottom-text-banner {
-    text-align: center;
-    padding: {{ section.settings.bottom_text_padding }}px 20px;
-    background-color: {{ section.settings.bottom_text_bg_color }};
-    margin-top: 20px;
-  }
-
-  /* Desktop bottom text - visible by default */
-  .bottom-text-desktop {
-    font-size: {{ section.settings.bottom_text_size }}px;
-    color: {{ section.settings.bottom_text_color }};
-    margin: 0;
-    letter-spacing: 0.5px;
-    text-transform: {{ section.settings.bottom_text_transform }};
-    display: block;
-  }
-
-  /* Mobile bottom text - hidden by default */
-  .bottom-text-mobile {
-    display: none;
-  }
-
-  /* Mobile bottom text styling */
-  @media (max-width: 768px) {
-    .bottom-text-desktop {
-      display: none;
-    }
-
-    .bottom-text-mobile {
-      display: block;
-      font-size: {{ section.settings.bottom_text_mobile_size }}px;
-      color: {{ section.settings.bottom_text_mobile_color }};
-      margin: 0;
-      letter-spacing: 0.5px;
-      text-transform: {{ section.settings.bottom_text_mobile_transform }};
-    }
-  }
-
-  /* Animation classes */
-  .tisso-animate-fade-in {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-  }
-
-  .tisso-animate-fade-in.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-</style>
-
-<div class="tisso-banner-container" id="tisso-banner-{{ section.id }}">
-  <div class="tisso-frames-wrapper">
+<!-- Popup Modal -->
+<div class="tisso-popup-overlay" id="tissoPopup">
+  <div class="tisso-popup">
+    <button class="tisso-popup__close" id="closePopup" aria-label="Close">×</button>
     
-    {% comment %} Frame 3 - Gift Guide {% endcomment %}
-    <div class="tisso-frame-3 tisso-animate-fade-in" data-animation-delay="200">
-      <div class="frame-3-content">
-        {% if section.settings.frame3_title != blank %}
-          <h2 class="frame-3-title">{{ section.settings.frame3_title }}</h2>
-        {% endif %}
+    <div class="tisso-popup__content">
+      <div class="tisso-popup__left">
+        <img id="popupImage" class="tisso-popup__image" src="" alt="">
+      </div>
+      
+      <div class="tisso-popup__right">
+        <h3 class="tisso-popup__title" id="popupTitle"></h3>
+        <p class="tisso-popup__price" id="popupPrice"></p>
+        <p class="tisso-popup__description" id="popupDescription"></p>
         
-        {% comment %} Desktop Description {% endcomment %}
-        {% if section.settings.frame3_description_desktop != blank %}
-          <div class="frame-3-description frame-3-description-desktop">
-            {{ section.settings.frame3_description_desktop }}
-          </div>
-        {% endif %}
+        <div class="tisso-popup__variants" id="popupVariants"></div>
         
-        {% comment %} Mobile Description {% endcomment %}
-        {% if section.settings.frame3_description_mobile != blank %}
-          <div class="frame-3-description frame-3-description-mobile">
-            {{ section.settings.frame3_description_mobile }}
-          </div>
-        {% endif %}
+        <button class="tisso-popup__add-to-cart" id="addToCart">
+          ADD TO CART
+          <span class="arrow">⟶</span>
+        </button>
         
-        {% if section.settings.frame3_button_text != blank %}
-          <a href="{{ section.settings.frame3_button_link }}" class="tisso-cta-button">
-            {{ section.settings.frame3_button_text }}
-            <span class="button-arrow">→</span>
-          </a>
-        {% endif %}
+        <div class="tisso-popup__message" id="cartMessage"></div>
       </div>
     </div>
-
-    {% comment %} Frame 1 - Top Image {% endcomment %}
-    <div class="tisso-frame-1 tisso-animate-fade-in" data-animation-delay="0">
-      {% if section.settings.frame1_image %}
-        <img 
-          src="{{ section.settings.frame1_image | img_url: 'master' }}" 
-          alt="{{ section.settings.frame1_image_alt }}"
-          class="frame-image"
-          loading="lazy"
-        >
-      {% else %}
-        <div style="background: #f0f0f0; height: 300px; display: flex; align-items: center; justify-content: center; color: #999;">
-          Frame 1 - Product Flatlay Image
-        </div>
-      {% endif %}
-    </div>
-
-    {% comment %} Frame 2 - Bottom Right Image {% endcomment %}
-    <div class="tisso-frame-2 tisso-animate-fade-in" data-animation-delay="400">
-      {% if section.settings.frame2_image %}
-        <img 
-          src="{{ section.settings.frame2_image | img_url: 'master' }}" 
-          alt="{{ section.settings.frame2_image_alt }}"
-          class="frame-image"
-          loading="lazy"
-        >
-      {% else %}
-        <div style="background: #f5f5f5; height: 300px; display: flex; align-items: center; justify-content: center; color: #999;">
-          Frame 2 - Product Details Image
-        </div>
-      {% endif %}
-    </div>
-
   </div>
 </div>
 
-{% comment %} Bottom Text Banner {% endcomment %}
-{% if section.settings.bottom_text_desktop != blank or section.settings.bottom_text_mobile != blank %}
-  <div class="tisso-bottom-text-banner">
-    {% if section.settings.bottom_text_desktop != blank %}
-      <p class="bottom-text bottom-text-desktop">{{ section.settings.bottom_text_desktop }}</p>
-    {% endif %}
-    {% if section.settings.bottom_text_mobile != blank %}
-      <p class="bottom-text bottom-text-mobile">{{ section.settings.bottom_text_mobile }}</p>
-    {% endif %}
-  </div>
-{% endif %}
+<style>
+/* === GRID STYLES === */
+.tisso-grid {
+  padding: 40px 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.tisso-grid__title {
+  font-size: 32px;
+  font-weight: 400;
+  margin-bottom: 30px;
+  text-align: left;
+  color: #333;
+}
+
+.tisso-grid__container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  grid-auto-rows: 1fr;
+}
+
+.tisso-grid__item {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4/5;
+  cursor: pointer;
+}
+
+.tisso-grid__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.tisso-grid__item:hover .tisso-grid__image {
+  transform: scale(1.05);
+}
+
+/* === PLUS BUTTON === */
+.tisso-grid__dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  color: #000;
+  padding: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+}
+
+.tisso-grid__dot::before {
+  content: '+';
+  font-size: 24px;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.tisso-grid__dot:hover {
+  background: #f0f0f0;
+  transform: translate(-50%, -50%) scale(1.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* === POPUP OVERLAY === */
+.tisso-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  padding: 20px;
+}
+
+.tisso-popup-overlay.active {
+  display: flex;
+}
+
+/* === POPUP CONTENT === */
+.tisso-popup {
+  background: white;
+  max-width: 700px;
+  width: 100%;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.tisso-popup__close {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #000;
+  line-height: 1;
+  padding: 4px;
+  z-index: 10;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tisso-popup__close:hover {
+  opacity: 0.7;
+}
+
+.tisso-popup__content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.tisso-popup__left {
+  background: #f5f5f5;
+}
+
+.tisso-popup__image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.tisso-popup__right {
+  padding: 32px 28px 28px;
+  display: flex;
+  flex-direction: column;
+}
+
+.tisso-popup__title {
+  font-size: 16px;
+  font-weight: 400;
+  margin: 0 0 8px 0;
+  color: #000;
+  line-height: 1.4;
+}
+
+.tisso-popup__price {
+  font-size: 16px;
+  font-weight: 400;
+  margin: 0 0 16px 0;
+  color: #000;
+}
+
+.tisso-popup__description {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #666;
+  margin: 0 0 24px 0;
+}
+
+/* === VARIANT SELECTORS === */
+.tisso-popup__variants {
+  margin-bottom: auto;
+  padding-bottom: 24px;
+}
+
+.tisso-variant-group {
+  margin-bottom: 20px;
+}
+
+.tisso-variant-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 400;
+  margin-bottom: 10px;
+  color: #000;
+}
+
+.tisso-variant-select {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 14px;
+  border: 1px solid #000;
+  background: white;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 40px;
+  font-weight: 400;
+  color: #000;
+}
+
+.tisso-variant-select:focus {
+  outline: none;
+  border-color: #000;
+}
+
+/* === COLOR BUTTONS - PICTURE PERFECT MATCH === */
+.tisso-color-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 1px solid #000;
+  overflow: hidden;
+}
+
+.tisso-color-option {
+  padding: 14px 16px;
+  border: none;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  font-weight: 400;
+  text-align: center;
+  color: #000;
+  position: relative;
+  border-right: 1px solid #000;
+}
+
+.tisso-color-option:last-child {
+  border-right: none;
+}
+
+/* Hover effect - turn black */
+.tisso-color-option:hover {
+  background: #000;
+  color: #fff;
+}
+
+/* Selected state */
+.tisso-color-option.selected {
+  background: #000;
+  color: #fff;
+}
+
+.tisso-color-option:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  background: white;
+  color: #000;
+}
+
+.tisso-color-option:disabled:hover {
+  background: white;
+  color: #000;
+}
+
+/* === ADD TO CART BUTTON === */
+.tisso-popup__add-to-cart {
+  width: 100%;
+  padding: 16px 24px;
+  background: #000;
+  color: #fff;
+  border: none;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.3s ease;
+  margin-top: auto;
+}
+
+.tisso-popup__add-to-cart:hover {
+  background: #333;
+}
+
+.tisso-popup__add-to-cart:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.tisso-popup__add-to-cart .arrow {
+  font-size: 16px;
+  transition: transform 0.3s ease;
+}
+
+.tisso-popup__add-to-cart:hover .arrow {
+  transform: translateX(4px);
+}
+
+/* === MESSAGE STYLES === */
+.tisso-popup__message {
+  margin-top: 12px;
+  padding: 10px;
+  text-align: center;
+  font-size: 13px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.tisso-popup__message.success {
+  opacity: 1;
+  color: #2d7a2d;
+  background: #e8f5e8;
+}
+
+.tisso-popup__message.error {
+  opacity: 1;
+  color: #c41e3a;
+  background: #ffeaee;
+}
+
+/* === MOBILE RESPONSIVE === */
+@media (max-width: 768px) {
+  .tisso-grid__container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+  
+  .tisso-grid__title {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  /* MOBILE POPUP - SAME LAYOUT AS DESKTOP */
+  .tisso-popup {
+    max-width: 95%;
+    margin: auto;
+  }
+  
+  .tisso-popup__content {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .tisso-popup__right {
+    padding: 24px 20px 20px;
+  }
+  
+  .tisso-popup__title {
+    font-size: 14px;
+  }
+  
+  .tisso-popup__price {
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+  
+  .tisso-popup__description {
+    font-size: 11px;
+    margin-bottom: 16px;
+  }
+  
+  .tisso-variant-label {
+    font-size: 12px;
+    margin-bottom: 8px;
+  }
+  
+  .tisso-variant-select,
+  .tisso-color-option {
+    padding: 12px 14px;
+    font-size: 13px;
+  }
+  
+  .tisso-popup__add-to-cart {
+    padding: 14px 20px;
+    font-size: 13px;
+  }
+  
+  .tisso-popup__variants {
+    padding-bottom: 16px;
+  }
+  
+  .tisso-variant-group {
+    margin-bottom: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tisso-grid__container {
+    grid-template-columns: 1fr;
+  }
+  
+  .tisso-popup__content {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .tisso-popup__right {
+    padding: 20px 16px 16px;
+  }
+  
+  .tisso-popup__title {
+    font-size: 13px;
+  }
+  
+  .tisso-popup__price {
+    font-size: 13px;
+  }
+  
+  .tisso-variant-select,
+  .tisso-color-option {
+    padding: 11px 12px;
+    font-size: 12px;
+  }
+}
+</style>
 
 <script>
 (function() {
   'use strict';
 
-  // Intersection Observer for fade-in animations
-  const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-  };
+  // ===== CONFIGURATION =====
+  const SOFT_WINTER_JACKET_VARIANT_ID = 48942836867395;
 
-  const observer = new IntersectionObserver(function(entries) {
-    entries.forEach(function(entry) {
-      if (entry.isIntersecting) {
-        const delay = entry.target.getAttribute('data-animation-delay') || 0;
-        setTimeout(function() {
-          entry.target.classList.add('visible');
-        }, parseInt(delay));
-        observer.unobserve(entry.target);
+  // ===== DOM ELEMENTS =====
+  const popup = document.getElementById('tissoPopup');
+  const closeBtn = document.getElementById('closePopup');
+  const addToCartBtn = document.getElementById('addToCart');
+  const cartMessage = document.getElementById('cartMessage');
+  const popupImage = document.getElementById('popupImage');
+  const popupTitle = document.getElementById('popupTitle');
+  const popupPrice = document.getElementById('popupPrice');
+  const popupDescription = document.getElementById('popupDescription');
+  const popupVariants = document.getElementById('popupVariants');
+
+  // ===== STATE =====
+  let currentProductData = null;
+  let currentProductHandle = null;
+  let selectedVariantId = null;
+  let selectedOptions = {};
+
+  // ===== INIT =====
+  function initButtons() {
+    const dots = document.querySelectorAll('.tisso-grid__dot');
+    console.log('Found', dots.length, 'product dots');
+    
+    dots.forEach(function(dot) {
+      dot.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const productHandle = this.getAttribute('data-product-handle');
+        const productId = this.getAttribute('data-product-id');
+        
+        console.log('Dot clicked for product:', productHandle);
+        
+        if (productHandle) {
+          loadProductData(productHandle);
+        } else {
+          console.error('No product handle found');
+        }
+      });
+    });
+  }
+
+  // ===== LOAD PRODUCT DATA =====
+  function loadProductData(handle) {
+    console.log('Loading product:', handle);
+    currentProductHandle = handle;
+    
+    fetch('/products/' + handle + '.js')
+      .then(function(res) { return res.json(); })
+      .then(function(product) {
+        console.log('Product loaded:', product);
+        currentProductData = product;
+        renderPopup(product);
+        openPopup();
+      })
+      .catch(function(err) {
+        console.error('Error loading product:', err);
+      });
+  }
+
+  // ===== RENDER POPUP =====
+  function renderPopup(product) {
+    // Set basic info
+    popupImage.src = product.featured_image;
+    popupImage.alt = product.title;
+    popupTitle.textContent = product.title;
+    popupPrice.textContent = formatPrice(product.price);
+    popupDescription.textContent = stripHtml(product.description);
+
+    // Clear variants container
+    popupVariants.innerHTML = '';
+    selectedOptions = {};
+    
+    // If only one variant, select it immediately
+    if (product.variants.length === 1) {
+      selectedVariantId = product.variants[0].id;
+      console.log('Single variant product, auto-selected:', selectedVariantId);
+      return;
+    }
+
+    // Build variant selectors
+    const optionNames = product.options.map(opt => opt.name);
+    console.log('Product options:', optionNames);
+
+    optionNames.forEach(function(optionName, index) {
+      const optionPosition = index + 1;
+      const values = getUniqueOptionValues(product, optionPosition);
+      
+      console.log('Option', optionName, 'values:', values);
+
+      const group = document.createElement('div');
+      group.className = 'tisso-variant-group';
+
+      const label = document.createElement('label');
+      label.className = 'tisso-variant-label';
+      label.textContent = optionName;
+      group.appendChild(label);
+
+      // Special handling for Color option
+      if (optionName.toLowerCase() === 'color' || optionName.toLowerCase() === 'colour') {
+        const colorContainer = document.createElement('div');
+        colorContainer.className = 'tisso-color-options';
+        
+        values.forEach(function(value) {
+          const btn = document.createElement('button');
+          btn.className = 'tisso-color-option';
+          btn.textContent = value;
+          btn.setAttribute('data-option-name', optionName);
+          btn.setAttribute('data-value', value);
+          btn.type = 'button';
+          
+          btn.addEventListener('click', function() {
+            // Remove selected from siblings
+            colorContainer.querySelectorAll('.tisso-color-option').forEach(function(b) {
+              b.classList.remove('selected');
+            });
+            
+            // Add selected to clicked
+            this.classList.add('selected');
+            
+            // Update selection
+            selectedOptions[optionName] = value;
+            console.log('Color selected:', value);
+            updateSelectedVariant();
+            updateAvailability();
+          });
+          
+          colorContainer.appendChild(btn);
+        });
+        
+        group.appendChild(colorContainer);
+      } else {
+        // Dropdown for other options (Size, etc.)
+        const select = document.createElement('select');
+        select.className = 'tisso-variant-select';
+        select.setAttribute('data-option-name', optionName);
+
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = 'Choose your ' + optionName.toLowerCase();
+        placeholder.disabled = true;
+        placeholder.selected = true;
+        select.appendChild(placeholder);
+
+        values.forEach(function(value) {
+          const option = document.createElement('option');
+          option.value = value;
+          option.textContent = value;
+          select.appendChild(option);
+        });
+
+        select.addEventListener('change', function() {
+          selectedOptions[optionName] = this.value;
+          console.log('Option selected:', optionName, '=', this.value);
+          updateSelectedVariant();
+          updateAvailability();
+        });
+
+        group.appendChild(select);
+      }
+
+      popupVariants.appendChild(group);
+    });
+  }
+
+  // ===== GET UNIQUE OPTION VALUES =====
+  function getUniqueOptionValues(product, position) {
+    const values = [];
+    product.variants.forEach(function(variant) {
+      const value = variant['option' + position];
+      if (value && values.indexOf(value) === -1) {
+        values.push(value);
       }
     });
-  }, observerOptions);
+    return values;
+  }
 
-  // Observe all animated elements
-  const animatedElements = document.querySelectorAll('.tisso-animate-fade-in');
-  animatedElements.forEach(function(el) {
-    observer.observe(el);
+  // ===== UPDATE SELECTED VARIANT =====
+  function updateSelectedVariant() {
+    if (!currentProductData) return;
+
+    const optionNames = currentProductData.options.map(opt => opt.name);
+    const allSelected = optionNames.every(name => selectedOptions[name]);
+
+    if (!allSelected) {
+      selectedVariantId = null;
+      console.log('Not all options selected yet');
+      return;
+    }
+
+    // Find matching variant
+    const variant = currentProductData.variants.find(function(v) {
+      return optionNames.every(function(name, index) {
+        return v['option' + (index + 1)] === selectedOptions[name];
+      });
+    });
+
+    if (variant) {
+      selectedVariantId = variant.id;
+      console.log('Variant selected:', selectedVariantId, variant);
+    } else {
+      selectedVariantId = null;
+      console.log('No matching variant found');
+    }
+  }
+
+  // ===== UPDATE AVAILABILITY =====
+  function updateAvailability() {
+    if (!currentProductData) return;
+
+    const optionNames = currentProductData.options.map(opt => opt.name);
+    
+    // For each option, check which values are available
+    optionNames.forEach(function(optionName, index) {
+      const optionPosition = index + 1;
+      const selector = document.querySelector('[data-option-name="' + optionName + '"]');
+      
+      if (!selector) return;
+
+      if (selector.classList.contains('tisso-color-options')) {
+        // Handle color buttons
+        const buttons = selector.querySelectorAll('.tisso-color-option');
+        buttons.forEach(function(btn) {
+          const value = btn.getAttribute('data-value');
+          const isAvailable = isOptionValueAvailable(optionName, value);
+          btn.disabled = !isAvailable;
+        });
+      } else {
+        // Handle dropdown
+        const options = selector.querySelectorAll('option:not([disabled])');
+        options.forEach(function(opt) {
+          if (opt.value) {
+            const isAvailable = isOptionValueAvailable(optionName, opt.value);
+            opt.disabled = !isAvailable;
+          }
+        });
+      }
+    });
+  }
+
+  // ===== CHECK IF OPTION VALUE IS AVAILABLE =====
+  function isOptionValueAvailable(optionName, value) {
+    if (!currentProductData) return false;
+
+    const optionNames = currentProductData.options.map(opt => opt.name);
+    const optionIndex = optionNames.indexOf(optionName);
+    
+    if (optionIndex === -1) return false;
+
+    const position = optionIndex + 1;
+
+    // Find variants that match current selections + this value
+    const matchingVariants = currentProductData.variants.filter(function(variant) {
+      // Must match this option value
+      if (variant['option' + position] !== value) return false;
+
+      // Must match all other selected options
+      return optionNames.every(function(name, i) {
+        if (name === optionName) return true;
+        if (!selectedOptions[name]) return true;
+        return variant['option' + (i + 1)] === selectedOptions[name];
+      });
+    });
+
+    // Available if at least one matching variant is in stock
+    return matchingVariants.some(v => v.available);
+  }
+
+  // ===== ADD TO CART =====
+  function addToCart() {
+    if (!selectedVariantId) {
+      showMessage('Please select all options', 'error');
+      return;
+    }
+
+    const variant = currentProductData.variants.find(v => v.id === selectedVariantId);
+    if (!variant || !variant.available) {
+      showMessage('This variant is out of stock', 'error');
+      return;
+    }
+
+    addToCartBtn.disabled = true;
+    addToCartBtn.innerHTML = 'ADDING...';
+
+    console.log('Adding to cart:', selectedVariantId);
+    
+    // Get selected option values
+    const selectedOptionValues = currentProductData.options.map(function(opt) {
+      return selectedOptions[opt.name];
+    });
+    
+    console.log('Selected option values:', selectedOptionValues);
+    
+    // Convert all option values to lowercase for comparison
+    const optionValuesLower = selectedOptionValues.map(opt => 
+      opt ? opt.toString().toLowerCase().trim() : ''
+    );
+    
+    console.log('Lowercase option values:', optionValuesLower);
+    
+    // Check for Black (handle variations)
+    const hasBlack = optionValuesLower.some(opt => 
+      opt === 'black' || opt === 'noir' || opt.includes('black')
+    );
+    
+    // Check for Medium (handle variations like "M", "Med", "Medium")
+    const hasMedium = optionValuesLower.some(opt => 
+      opt === 'medium' || opt === 'm' || opt === 'med' || opt.includes('medium')
+    );
+    
+    console.log('Black + Medium check:', { 
+      hasBlack, 
+      hasMedium, 
+      optionValuesLower,
+      willAddBonus: hasBlack && hasMedium 
+    });
+    
+    // Add the main product first
+    fetch('/cart/add.js', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: selectedVariantId,
+        quantity: 1
+      })
+    })
+    .then(function(response) {
+      if (!response.ok) throw new Error('Failed to add to cart');
+      return response.json();
+    })
+    .then(function(data) {
+      console.log('Main product added to cart:', data);
+      
+      // If Black + Medium, add the Soft Winter Jacket
+      if (hasBlack && hasMedium) {
+        console.log('✅ BLACK + MEDIUM DETECTED! Adding Soft Winter Jacket...');
+        showMessage('Added to cart! Adding bonus item...', 'success');
+        
+        // Add Soft Winter Jacket after a short delay
+        return new Promise(resolve => {
+          setTimeout(() => {
+            addSoftWinterJacket()
+              .then(() => {
+                console.log('✅ Soft Winter Jacket added successfully');
+                showMessage('Added to cart! Bonus item included!', 'success');
+                
+                // Dispatch cart update event
+                const event = new CustomEvent('tisso:cart-updated', {
+                  detail: { 
+                    product: currentProductHandle,
+                    variant: selectedVariantId,
+                    bonusAdded: true
+                  }
+                });
+                document.dispatchEvent(event);
+                console.log('Dispatched tisso:cart-updated event with bonus');
+                
+                // Close popup after a delay
+                setTimeout(closePopup, 2000);
+                resolve();
+              })
+              .catch(error => {
+                console.error('Error adding bonus item:', error);
+                showMessage('Added to cart! (Bonus item failed)', 'success');
+                
+                // Still dispatch event even if bonus failed
+                const event = new CustomEvent('tisso:cart-updated', {
+                  detail: { 
+                    product: currentProductHandle,
+                    variant: selectedVariantId,
+                    bonusAdded: false
+                  }
+                });
+                document.dispatchEvent(event);
+                
+                setTimeout(closePopup, 1500);
+                resolve();
+              });
+          }, 500);
+        });
+      } else {
+        // No Black + Medium, just show success
+        showMessage('Added to cart!', 'success');
+        
+        // Dispatch cart update event
+        const event = new CustomEvent('tisso:cart-updated', {
+          detail: { 
+            product: currentProductHandle,
+            variant: selectedVariantId,
+            bonusAdded: false
+          }
+        });
+        document.dispatchEvent(event);
+        console.log('Dispatched tisso:cart-updated event');
+        
+        // Close popup after a delay
+        setTimeout(closePopup, 1500);
+        return Promise.resolve();
+      }
+    })
+    .then(function() {
+      // Refresh the cart globally
+      return fetch('/cart.js')
+        .then(function(res) { return res.json(); })
+        .then(function(cart) {
+          document.dispatchEvent(new CustomEvent('cart:updated', { detail: cart }));
+          console.log('Shopify cart updated event dispatched');
+        });
+    })
+    .catch(function(error) {
+      console.error('Cart error:', error);
+      showMessage('Failed to add to cart', 'error');
+    })
+    .finally(function() {
+      addToCartBtn.disabled = false;
+      addToCartBtn.innerHTML = 'ADD TO CART <span class="arrow">⟶</span>';
+    });
+  }
+
+  // ===== ADD SOFT WINTER JACKET =====
+  function addSoftWinterJacket() {
+    console.log('Attempting to add Soft Winter Jacket with variant ID:', SOFT_WINTER_JACKET_VARIANT_ID);
+    console.log('Variant ID type:', typeof SOFT_WINTER_JACKET_VARIANT_ID);
+    
+    return fetch('/cart/add.js', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: SOFT_WINTER_JACKET_VARIANT_ID,
+        quantity: 1
+      })
+    })
+    .then(function(response) {
+      console.log('Response status:', response.status);
+      
+      // Get the response body for error details
+      return response.json().then(function(data) {
+        console.log('Response data:', data);
+        
+        if (!response.ok) {
+          console.error('❌ Failed to add Soft Winter Jacket. Status:', response.status);
+          console.error('Full response:', data);
+          
+          // Provide helpful error messages
+          if (response.status === 422) {
+            console.error('=== 422 ERROR DETAILS ===');
+            console.error('Description:', data.description);
+            console.error('Message:', data.message);
+            console.error('Status:', data.status);
+            
+            if (data.description && data.description.includes('out of stock')) {
+              console.error('🔴 REASON: The Soft Winter Jacket variant is OUT OF STOCK');
+              console.error('👉 Go to Shopify Admin > Products > Soft Winter Jacket and increase inventory');
+            } else if (data.description && data.description.includes('not found')) {
+              console.error('🔴 REASON: Variant ID', SOFT_WINTER_JACKET_VARIANT_ID, 'does not exist');
+              console.error('👉 Verify the variant ID is correct');
+            } else {
+              console.error('🔴 REASON: Unknown - Full error:', data);
+              console.error('👉 Check variant availability and inventory in Shopify Admin');
+            }
+          }
+          
+          throw new Error(data.description || data.message || 'Failed to add bonus item');
+        }
+        return data;
+      });
+    })
+    .then(function(data) {
+      console.log('✅ Soft Winter Jacket added successfully:', data);
+      return data;
+    })
+    .catch(function(error) {
+      console.error('Catch block error:', error);
+      throw error;
+    });
+  }
+
+  // ===== POPUP CONTROLS =====
+  function openPopup() {
+    popup.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closePopup() {
+    popup.classList.remove('active');
+    document.body.style.overflow = '';
+    hideMessage();
+    currentProductData = null;
+    currentProductHandle = null;
+    selectedVariantId = null;
+    selectedOptions = {};
+  }
+
+  function showMessage(text, type) {
+    cartMessage.textContent = text;
+    cartMessage.className = 'tisso-popup__message ' + type;
+  }
+
+  function hideMessage() {
+    cartMessage.className = 'tisso-popup__message';
+    cartMessage.textContent = '';
+  }
+
+  // ===== UTILITY FUNCTIONS =====
+  function formatPrice(cents) {
+    return (cents / 100).toFixed(2) + '€';
+  }
+
+  function stripHtml(html) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || '';
+  }
+
+  // ===== EVENT LISTENERS =====
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closePopup);
+  }
+
+  if (popup) {
+    popup.addEventListener('click', function(e) {
+      if (e.target === popup) {
+        closePopup();
+      }
+    });
+  }
+
+  if (addToCartBtn) {
+    addToCartBtn.addEventListener('click', addToCart);
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && popup.classList.contains('active')) {
+      closePopup();
+    }
   });
+
+  // ===== INITIALIZE =====
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initButtons);
+  } else {
+    initButtons();
+  }
+
+  console.log('Tisso Product Grid Script Loaded Successfully');
+  console.log('Soft Winter Jacket Variant ID:', SOFT_WINTER_JACKET_VARIANT_ID);
+  
 })();
 </script>
 
 {% schema %}
 {
-  "name": "Tisso Banner Frames",
+  "name": "Tisso Product Grid",
   "class": "tisso-product-grid-section",
   "settings": [
     {
-      "type": "header",
-      "content": "🎨 General Settings"
-    },
-    {
-      "type": "color",
-      "id": "background_color",
-      "label": "Section Background Color",
-      "default": "#ffffff"
-    },
-    {
-      "type": "range",
-      "id": "section_padding",
-      "label": "Section Padding",
-      "min": 0,
-      "max": 100,
-      "step": 5,
-      "unit": "px",
-      "default": 40
-    },
-    {
-      "type": "range",
-      "id": "frame_padding",
-      "label": "Frame 3 Padding",
-      "min": 20,
-      "max": 80,
-      "step": 5,
-      "unit": "px",
-      "default": 40
-    },
-    {
-      "type": "header",
-      "content": "🖼️ Frame 1 - Top Image"
-    },
-    {
-      "type": "image_picker",
-      "id": "frame1_image",
-      "label": "Frame 1 Image"
-    },
-    {
       "type": "text",
-      "id": "frame1_image_alt",
-      "label": "Frame 1 Image Alt Text",
-      "default": "Product flatlay"
-    },
+      "id": "section_title",
+      "label": "Section Title",
+      "default": "Tisso vision in the wild"
+    }
+  ],
+  "blocks": [
     {
-      "type": "color",
-      "id": "frame1_bg_color",
-      "label": "Frame 1 Background Color",
-      "default": "#ffffff"
-    },
-    {
-      "type": "header",
-      "content": "🖼️ Frame 2 - Bottom Right Image"
-    },
-    {
-      "type": "image_picker",
-      "id": "frame2_image",
-      "label": "Frame 2 Image"
-    },
-    {
-      "type": "text",
-      "id": "frame2_image_alt",
-      "label": "Frame 2 Image Alt Text",
-      "default": "Product details"
-    },
-    {
-      "type": "color",
-      "id": "frame2_bg_color",
-      "label": "Frame 2 Background Color",
-      "default": "#ffffff"
-    },
-    {
-      "type": "header",
-      "content": "Frame 3 - Gift Guide Section"
-    },
-    {
-      "type": "color",
-      "id": "frame3_bg_color",
-      "label": "Frame 3 Background Color",
-      "default": "#ffffff"
-    },
-    {
-      "type": "header",
-      "content": "📝 Gift Guide Title"
-    },
-    {
-      "type": "text",
-      "id": "frame3_title",
-      "label": "Title Text",
-      "default": "The Gift Guide",
-      "info": "Main heading text - fully editable"
-    },
-    {
-      "type": "range",
-      "id": "frame3_title_size",
-      "label": "Desktop Title Font Size",
-      "min": 20,
-      "max": 60,
-      "step": 2,
-      "unit": "px",
-      "default": 36
-    },
-    {
-      "type": "select",
-      "id": "frame3_title_weight",
-      "label": "Title Font Weight",
-      "options": [
-        {"value": "400", "label": "Normal"},
-        {"value": "600", "label": "Semi Bold"},
-        {"value": "700", "label": "Bold"}
-      ],
-      "default": "700"
-    },
-    {
-      "type": "color",
-      "id": "frame3_title_color",
-      "label": "Desktop Title Color",
-      "default": "#000000"
-    },
-    {
-      "type": "header",
-      "content": "💻 Desktop Description"
-    },
-    {
-      "type": "richtext",
-      "id": "frame3_description_desktop",
-      "label": "Desktop Description Text",
-      "default": "<p>Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season.</p>",
-      "info": "This text appears on desktop only"
-    },
-    {
-      "type": "range",
-      "id": "frame3_desc_size",
-      "label": "Desktop Description Font Size",
-      "min": 12,
-      "max": 24,
-      "step": 1,
-      "unit": "px",
-      "default": 14
-    },
-    {
-      "type": "color",
-      "id": "frame3_desc_color",
-      "label": "Desktop Description Color",
-      "default": "#666666"
-    },
-    {
-      "type": "range",
-      "id": "frame3_desc_line_height",
-      "label": "Desktop Description Line Height",
-      "min": 1.2,
-      "max": 2.0,
-      "step": 0.1,
-      "default": 1.6
-    },
-    {
-      "type": "header",
-      "content": "📱 Mobile Description"
-    },
-    {
-      "type": "richtext",
-      "id": "frame3_description_mobile",
-      "label": "Mobile Description Text",
-      "default": "<p>Explore our curated selection and find the perfect gifts.</p>",
-      "info": "This text appears on mobile only - can be shorter than desktop"
-    },
-    {
-      "type": "range",
-      "id": "frame3_desc_mobile_size",
-      "label": "Mobile Description Font Size",
-      "min": 12,
-      "max": 18,
-      "step": 1,
-      "unit": "px",
-      "default": 14
-    },
-    {
-      "type": "color",
-      "id": "frame3_desc_mobile_color",
-      "label": "Mobile Description Color",
-      "default": "#333333"
-    },
-    {
-      "type": "header",
-      "content": "📱 Mobile Title Settings"
-    },
-    {
-      "type": "range",
-      "id": "frame3_title_mobile_size",
-      "label": "Mobile Title Font Size",
-      "min": 20,
-      "max": 40,
-      "step": 2,
-      "unit": "px",
-      "default": 28
-    },
-    {
-      "type": "color",
-      "id": "frame3_title_mobile_color",
-      "label": "Mobile Title Color",
-      "default": "#000000"
-    },
-    {
-      "type": "header",
-      "content": "🔘 Button Settings"
-    },
-    {
-      "type": "text",
-      "id": "frame3_button_text",
-      "label": "Button Text",
-      "default": "SHOP NOW"
-    },
-    {
-      "type": "url",
-      "id": "frame3_button_link",
-      "label": "Button Link URL"
-    },
-    {
-      "type": "color",
-      "id": "button_bg_color",
-      "label": "Button Background Color",
-      "default": "#FFF544"
-    },
-    {
-      "type": "color",
-      "id": "button_text_color",
-      "label": "Button Text Color",
-      "default": "#000000"
-    },
-    {
-      "type": "color",
-      "id": "button_hover_bg_color",
-      "label": "Button Hover Background Color",
-      "default": "#000000"
-    },
-    {
-      "type": "color",
-      "id": "button_hover_text_color",
-      "label": "Button Hover Text Color",
-      "default": "#ffffff"
-    },
-    {
-      "type": "range",
-      "id": "button_font_size",
-      "label": "Desktop Button Font Size",
-      "min": 12,
-      "max": 24,
-      "step": 1,
-      "unit": "px",
-      "default": 14
-    },
-    {
-      "type": "select",
-      "id": "button_font_weight",
-      "label": "Button Font Weight",
-      "options": [
-        {"value": "400", "label": "Normal"},
-        {"value": "600", "label": "Semi Bold"},
-        {"value": "700", "label": "Bold"}
-      ],
-      "default": "700"
-    },
-    {
-      "type": "range",
-      "id": "button_padding_v",
-      "label": "Button Vertical Padding",
-      "min": 8,
-      "max": 30,
-      "step": 2,
-      "unit": "px",
-      "default": 12
-    },
-    {
-      "type": "range",
-      "id": "button_padding_h",
-      "label": "Button Horizontal Padding",
-      "min": 15,
-      "max": 50,
-      "step": 5,
-      "unit": "px",
-      "default": 30
-    },
-    {
-      "type": "range",
-      "id": "button_border_radius",
-      "label": "Button Border Radius",
-      "min": 0,
-      "max": 30,
-      "step": 2,
-      "unit": "px",
-      "default": 4
-    },
-    {
-      "type": "range",
-      "id": "button_mobile_size",
-      "label": "Mobile Button Font Size",
-      "min": 12,
-      "max": 18,
-      "step": 1,
-      "unit": "px",
-      "default": 13
-    },
-    {
-      "type": "range",
-      "id": "button_mobile_padding_v",
-      "label": "Mobile Button Vertical Padding",
-      "min": 8,
-      "max": 16,
-      "step": 1,
-      "unit": "px",
-      "default": 10
-    },
-    {
-      "type": "range",
-      "id": "button_mobile_padding_h",
-      "label": "Mobile Button Horizontal Padding",
-      "min": 15,
-      "max": 30,
-      "step": 1,
-      "unit": "px",
-      "default": 20
-    },
-    {
-      "type": "header",
-      "content": "💻 Desktop Bottom Text Banner"
-    },
-    {
-      "type": "text",
-      "id": "bottom_text_desktop",
-      "label": "Desktop Bottom Text",
-      "default": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6X",
-      "info": "This text appears on desktop only"
-    },
-    {
-      "type": "range",
-      "id": "bottom_text_size",
-      "label": "Desktop Bottom Text Font Size",
-      "min": 10,
-      "max": 20,
-      "step": 1,
-      "unit": "px",
-      "default": 12
-    },
-    {
-      "type": "color",
-      "id": "bottom_text_color",
-      "label": "Desktop Bottom Text Color",
-      "default": "#666666"
-    },
-    {
-      "type": "select",
-      "id": "bottom_text_transform",
-      "label": "Desktop Text Transform",
-      "options": [
-        {"value": "none", "label": "None"},
-        {"value": "uppercase", "label": "Uppercase"},
-        {"value": "lowercase", "label": "Lowercase"},
-        {"value": "capitalize", "label": "Capitalize"}
-      ],
-      "default": "uppercase"
-    },
-    {
-      "type": "header",
-      "content": "📱 Mobile Bottom Text Banner"
-    },
-    {
-      "type": "text",
-      "id": "bottom_text_mobile",
-      "label": "Mobile Bottom Text",
-      "default": "ETHICALLY MADE • SIZES XXS-6X",
-      "info": "This text appears on mobile only - can be shorter than desktop"
-    },
-    {
-      "type": "range",
-      "id": "bottom_text_mobile_size",
-      "label": "Mobile Bottom Text Font Size",
-      "min": 10,
-      "max": 16,
-      "step": 1,
-      "unit": "px",
-      "default": 11
-    },
-    {
-      "type": "color",
-      "id": "bottom_text_mobile_color",
-      "label": "Mobile Bottom Text Color",
-      "default": "#666666"
-    },
-    {
-      "type": "select",
-      "id": "bottom_text_mobile_transform",
-      "label": "Mobile Text Transform",
-      "options": [
-        {"value": "none", "label": "None"},
-        {"value": "uppercase", "label": "Uppercase"},
-        {"value": "lowercase", "label": "Lowercase"},
-        {"value": "capitalize", "label": "Capitalize"}
-      ],
-      "default": "uppercase"
-    },
-    {
-      "type": "header",
-      "content": "⚙️ Bottom Banner Settings"
-    },
-    {
-      "type": "color",
-      "id": "bottom_text_bg_color",
-      "label": "Bottom Text Background Color",
-      "default": "#ffffff"
-    },
-    {
-      "type": "range",
-      "id": "bottom_text_padding",
-      "label": "Bottom Text Padding",
-      "min": 5,
-      "max": 40,
-      "step": 5,
-      "unit": "px",
-      "default": 15
+      "type": "product",
+      "name": "Product",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Select Product"
+        }
+      ]
     }
   ],
   "presets": [
     {
-      "name": "Tisso Banner Frames",
-      "category": "Custom"
+      "name": "Tisso Product Grid"
     }
   ]
 }
