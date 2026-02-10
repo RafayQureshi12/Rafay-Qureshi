@@ -272,7 +272,7 @@ Matches the Orange Wide Leg design reference
   border-color: #000;
 }
 
-/* === COLOR BUTTONS - PICTURE PERFECT MATCH === */
+/* === COLOR BUTTONS WITH COLOR STRIPS === */
 .tisso-color-options {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -282,21 +282,101 @@ Matches the Orange Wide Leg design reference
 }
 
 .tisso-color-option {
-  padding: 14px 16px;
+  padding: 0;
   border: none;
   background: white;
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 14px;
   font-weight: 400;
-  text-align: center;
+  text-align: left;
   color: #000;
   position: relative;
   border-right: 1px solid #000;
+  display: flex;
+  align-items: center;
+  height: 48px;
 }
 
 .tisso-color-option:last-child {
   border-right: none;
+}
+
+/* Color strip on the left side */
+.tisso-color-option::before {
+  content: '';
+  width: 80px;
+  height: 100%;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+/* Color-specific strips */
+.tisso-color-option[data-value="White"]::before,
+.tisso-color-option[data-value="white"]::before {
+  background: #ffffff;
+  border-right: 1px solid #e0e0e0;
+}
+
+.tisso-color-option[data-value="Black"]::before,
+.tisso-color-option[data-value="black"]::before {
+  background: #000000;
+}
+
+.tisso-color-option[data-value="Red"]::before,
+.tisso-color-option[data-value="red"]::before {
+  background: #ff0000;
+}
+
+.tisso-color-option[data-value="Blue"]::before,
+.tisso-color-option[data-value="blue"]::before {
+  background: #0000ff;
+}
+
+.tisso-color-option[data-value="Green"]::before,
+.tisso-color-option[data-value="green"]::before {
+  background: #00ff00;
+}
+
+.tisso-color-option[data-value="Navy"]::before,
+.tisso-color-option[data-value="navy"]::before {
+  background: #001f3f;
+}
+
+.tisso-color-option[data-value="Gray"]::before,
+.tisso-color-option[data-value="grey"]::before,
+.tisso-color-option[data-value="Gray"]::before {
+  background: #808080;
+}
+
+.tisso-color-option[data-value="Beige"]::before,
+.tisso-color-option[data-value="beige"]::before {
+  background: #f5f5dc;
+}
+
+.tisso-color-option[data-value="Brown"]::before,
+.tisso-color-option[data-value="brown"]::before {
+  background: #8b4513;
+}
+
+.tisso-color-option[data-value="Pink"]::before,
+.tisso-color-option[data-value="pink"]::before {
+  background: #ffc0cb;
+}
+
+.tisso-color-option[data-value="Yellow"]::before,
+.tisso-color-option[data-value="yellow"]::before {
+  background: #ffff00;
+}
+
+.tisso-color-option[data-value="Orange"]::before,
+.tisso-color-option[data-value="orange"]::before {
+  background: #ffa500;
+}
+
+.tisso-color-option[data-value="Purple"]::before,
+.tisso-color-option[data-value="purple"]::before {
+  background: #800080;
 }
 
 /* Hover effect - turn black */
@@ -429,8 +509,15 @@ Matches the Orange Wide Leg design reference
   
   .tisso-variant-select,
   .tisso-color-option {
-    padding: 12px 14px;
     font-size: 13px;
+  }
+  
+  .tisso-color-option {
+    height: 44px;
+  }
+  
+  .tisso-color-option::before {
+    width: 70px;
   }
   
   .tisso-popup__add-to-cart {
@@ -468,10 +555,18 @@ Matches the Orange Wide Leg design reference
     font-size: 13px;
   }
   
-  .tisso-variant-select,
-  .tisso-color-option {
+  .tisso-variant-select {
     padding: 11px 12px;
     font-size: 12px;
+  }
+  
+  .tisso-color-option {
+    font-size: 12px;
+    height: 42px;
+  }
+  
+  .tisso-color-option::before {
+    width: 60px;
   }
 }
 </style>
