@@ -1,9 +1,9 @@
 {% comment %}
-  Tisso Banner Frames Section
-  Three seamless frames without borders
-  Frame 1: Top - Product flatlay
-  Frame 2: Bottom right - Product details
-  Frame 3: Bottom left - Gift Guide CTA
+  Tisso Banner Frames Section - Updated Version
+  - Separate mobile and desktop descriptions
+  - Separate mobile and desktop bottom text
+  - Fixed mobile image display
+  - All content editable from customizer
 {% endcomment %}
 
 <style>
@@ -92,12 +92,19 @@
     line-height: 1.2;
   }
 
-  .frame-3-description {
+  /* Desktop description - visible by default */
+  .frame-3-description-desktop {
     font-size: {{ section.settings.frame3_desc_size }}px;
     color: {{ section.settings.frame3_desc_color }};
     margin-bottom: 25px;
     line-height: {{ section.settings.frame3_desc_line_height }};
     max-width: 90%;
+    display: block;
+  }
+
+  /* Mobile description - hidden by default */
+  .frame-3-description-mobile {
+    display: none;
   }
 
   .frame-3-description p {
@@ -138,9 +145,9 @@
   }
 
   /* ────────────────────────────────────────────────
-     IMPROVED MOBILE VIEW – BETTER SPACING & LAYOUT
+     MOBILE VIEW - FIXED LAYOUT + SEPARATE CONTENT
   ──────────────────────────────────────────────── */
-@media (max-width: 768px) {
+  @media (max-width: 768px) {
     .tisso-banner-container {
       padding: 0;
       background: white;
@@ -158,6 +165,7 @@
       order: 1;
       background: white;
       padding: 40px 24px 30px;
+      display: flex;
       justify-content: center;
       align-items: center;
       text-align: center;
@@ -176,7 +184,14 @@
       line-height: 1.15;
     }
 
-    .frame-3-description {
+    /* Hide desktop description on mobile */
+    .frame-3-description-desktop {
+      display: none;
+    }
+
+    /* Show mobile description on mobile */
+    .frame-3-description-mobile {
+      display: block;
       font-size: {{ section.settings.frame3_desc_mobile_size }}px;
       color: {{ section.settings.frame3_desc_mobile_color }};
       max-width: 100%;
@@ -184,20 +199,24 @@
       line-height: 1.5;
     }
 
-    /* Frame 1 - Image below text */
+    /* Frame 1 - Image below text - FIXED */
     .tisso-frame-1 {
       order: 2;
       width: 100%;
       height: auto;
+      max-width: 100%;
       margin: 0;
-      padding: 0;
+      padding: 0 20px;
       overflow: visible;
+      background: white;
     }
 
     .tisso-frame-1 .frame-image {
       width: 100%;
       height: auto;
+      max-height: 500px;
       object-fit: contain;
+      object-position: center;
       display: block;
     }
 
@@ -215,12 +234,6 @@
     }
   }
 
-    /* Remove forced height hack */
-    .tisso-frames-wrapper::after {
-      content: none;
-    }
-  }
-
   /* Bottom Text Banner */
   .tisso-bottom-text-banner {
     text-align: center;
@@ -229,12 +242,35 @@
     margin-top: 20px;
   }
 
-  .bottom-text {
+  /* Desktop bottom text - visible by default */
+  .bottom-text-desktop {
     font-size: {{ section.settings.bottom_text_size }}px;
     color: {{ section.settings.bottom_text_color }};
     margin: 0;
     letter-spacing: 0.5px;
     text-transform: {{ section.settings.bottom_text_transform }};
+    display: block;
+  }
+
+  /* Mobile bottom text - hidden by default */
+  .bottom-text-mobile {
+    display: none;
+  }
+
+  /* Mobile bottom text styling */
+  @media (max-width: 768px) {
+    .bottom-text-desktop {
+      display: none;
+    }
+
+    .bottom-text-mobile {
+      display: block;
+      font-size: {{ section.settings.bottom_text_mobile_size }}px;
+      color: {{ section.settings.bottom_text_mobile_color }};
+      margin: 0;
+      letter-spacing: 0.5px;
+      text-transform: {{ section.settings.bottom_text_mobile_transform }};
+    }
   }
 
   /* Animation classes */
@@ -260,8 +296,18 @@
           <h2 class="frame-3-title">{{ section.settings.frame3_title }}</h2>
         {% endif %}
         
-        {% if section.settings.frame3_description != blank %}
-          <div class="frame-3-description">{{ section.settings.frame3_description }}</div>
+        {% comment %} Desktop Description {% endcomment %}
+        {% if section.settings.frame3_description_desktop != blank %}
+          <div class="frame-3-description frame-3-description-desktop">
+            {{ section.settings.frame3_description_desktop }}
+          </div>
+        {% endif %}
+        
+        {% comment %} Mobile Description {% endcomment %}
+        {% if section.settings.frame3_description_mobile != blank %}
+          <div class="frame-3-description frame-3-description-mobile">
+            {{ section.settings.frame3_description_mobile }}
+          </div>
         {% endif %}
         
         {% if section.settings.frame3_button_text != blank %}
@@ -299,7 +345,7 @@
           loading="lazy"
         >
       {% else %}
-        <div style="background: #f0f0f0; height: 300px; display: flex; align-items: center; justify-content: center; color: #999;">
+        <div style="background: #f5f5f5; height: 300px; display: flex; align-items: center; justify-content: center; color: #999;">
           Frame 2 - Product Details Image
         </div>
       {% endif %}
@@ -308,62 +354,56 @@
   </div>
 </div>
 
-{% comment %} Bottom Editable Text Banner {% endcomment %}
-{% if section.settings.bottom_text != blank %}
-<div class="tisso-bottom-text-banner">
-  <p class="bottom-text">{{ section.settings.bottom_text }}</p>
-</div>
+{% comment %} Bottom Text Banner {% endcomment %}
+{% if section.settings.bottom_text_desktop != blank or section.settings.bottom_text_mobile != blank %}
+  <div class="tisso-bottom-text-banner">
+    {% if section.settings.bottom_text_desktop != blank %}
+      <p class="bottom-text bottom-text-desktop">{{ section.settings.bottom_text_desktop }}</p>
+    {% endif %}
+    {% if section.settings.bottom_text_mobile != blank %}
+      <p class="bottom-text bottom-text-mobile">{{ section.settings.bottom_text_mobile }}</p>
+    {% endif %}
+  </div>
 {% endif %}
 
 <script>
-  (function() {
-    'use strict';
+(function() {
+  'use strict';
 
-    function initTissoBanner() {
-      const bannerId = 'tisso-banner-{{ section.id }}';
-      const bannerContainer = document.getElementById(bannerId);
-      
-      if (!bannerContainer) return;
+  // Intersection Observer for fade-in animations
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
 
-      const animatedElements = bannerContainer.querySelectorAll('.tisso-animate-fade-in');
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        const delay = entry.target.getAttribute('data-animation-delay') || 0;
+        setTimeout(function() {
+          entry.target.classList.add('visible');
+        }, parseInt(delay));
+        observer.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
 
-      const observerOptions = {
-        root: null,
-        rootMargin: '0px 0px -100px 0px',
-        threshold: 0.1
-      };
-
-      const handleIntersection = function(entries, observer) {
-        entries.forEach(function(entry) {
-          if (entry.isIntersecting) {
-            const delay = parseInt(entry.target.getAttribute('data-animation-delay')) || 0;
-            setTimeout(function() {
-              entry.target.classList.add('visible');
-            }, delay);
-            observer.unobserve(entry.target);
-          }
-        });
-      };
-
-      const observer = new IntersectionObserver(handleIntersection, observerOptions);
-      animatedElements.forEach(el => observer.observe(el));
-    }
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initTissoBanner);
-    } else {
-      initTissoBanner();
-    }
-  })();
+  // Observe all animated elements
+  const animatedElements = document.querySelectorAll('.tisso-animate-fade-in');
+  animatedElements.forEach(function(el) {
+    observer.observe(el);
+  });
+})();
 </script>
 
 {% schema %}
 {
   "name": "Tisso Banner Frames",
+  "class": "tisso-product-grid-section",
   "settings": [
     {
       "type": "header",
-      "content": "Section Settings"
+      "content": "🎨 General Settings"
     },
     {
       "type": "color",
@@ -384,16 +424,16 @@
     {
       "type": "range",
       "id": "frame_padding",
-      "label": "Frame Inner Padding",
-      "min": 10,
-      "max": 60,
+      "label": "Frame 3 Padding",
+      "min": 20,
+      "max": 80,
       "step": 5,
       "unit": "px",
-      "default": 30
+      "default": 40
     },
     {
       "type": "header",
-      "content": "Frame 1 - Top Image"
+      "content": "🖼️ Frame 1 - Top Image"
     },
     {
       "type": "image_picker",
@@ -414,7 +454,7 @@
     },
     {
       "type": "header",
-      "content": "Frame 2 - Bottom Right Image"
+      "content": "🖼️ Frame 2 - Bottom Right Image"
     },
     {
       "type": "image_picker",
@@ -457,7 +497,7 @@
     {
       "type": "range",
       "id": "frame3_title_size",
-      "label": "Title Font Size",
+      "label": "Desktop Title Font Size",
       "min": 20,
       "max": 60,
       "step": 2,
@@ -478,24 +518,24 @@
     {
       "type": "color",
       "id": "frame3_title_color",
-      "label": "Title Color",
+      "label": "Desktop Title Color",
       "default": "#000000"
     },
     {
       "type": "header",
-      "content": "📝 Gift Guide Description"
+      "content": "💻 Desktop Description"
     },
     {
       "type": "richtext",
-      "id": "frame3_description",
-      "label": "Description Text",
+      "id": "frame3_description_desktop",
+      "label": "Desktop Description Text",
       "default": "<p>Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season.</p>",
-      "info": "Full description text - fully editable"
+      "info": "This text appears on desktop only"
     },
     {
       "type": "range",
       "id": "frame3_desc_size",
-      "label": "Description Font Size",
+      "label": "Desktop Description Font Size",
       "min": 12,
       "max": 24,
       "step": 1,
@@ -505,13 +545,13 @@
     {
       "type": "color",
       "id": "frame3_desc_color",
-      "label": "Description Color",
+      "label": "Desktop Description Color",
       "default": "#666666"
     },
     {
       "type": "range",
       "id": "frame3_desc_line_height",
-      "label": "Description Line Height",
+      "label": "Desktop Description Line Height",
       "min": 1.2,
       "max": 2.0,
       "step": 0.1,
@@ -519,23 +559,14 @@
     },
     {
       "type": "header",
-      "content": "📱 Mobile Overlay Settings"
+      "content": "📱 Mobile Description"
     },
     {
-      "type": "range",
-      "id": "frame3_title_mobile_size",
-      "label": "Mobile Title Font Size",
-      "min": 20,
-      "max": 40,
-      "step": 2,
-      "unit": "px",
-      "default": 28
-    },
-    {
-      "type": "color",
-      "id": "frame3_title_mobile_color",
-      "label": "Mobile Title Color",
-      "default": "#000000"
+      "type": "richtext",
+      "id": "frame3_description_mobile",
+      "label": "Mobile Description Text",
+      "default": "<p>Explore our curated selection and find the perfect gifts.</p>",
+      "info": "This text appears on mobile only - can be shorter than desktop"
     },
     {
       "type": "range",
@@ -554,34 +585,24 @@
       "default": "#333333"
     },
     {
-      "type": "range",
-      "id": "button_mobile_size",
-      "label": "Mobile Button Font Size",
-      "min": 12,
-      "max": 18,
-      "step": 1,
-      "unit": "px",
-      "default": 13
+      "type": "header",
+      "content": "📱 Mobile Title Settings"
     },
     {
       "type": "range",
-      "id": "button_mobile_padding_v",
-      "label": "Mobile Button Vertical Padding",
-      "min": 8,
-      "max": 16,
-      "step": 1,
+      "id": "frame3_title_mobile_size",
+      "label": "Mobile Title Font Size",
+      "min": 20,
+      "max": 40,
+      "step": 2,
       "unit": "px",
-      "default": 10
+      "default": 28
     },
     {
-      "type": "range",
-      "id": "button_mobile_padding_h",
-      "label": "Mobile Button Horizontal Padding",
-      "min": 15,
-      "max": 30,
-      "step": 1,
-      "unit": "px",
-      "default": 20
+      "type": "color",
+      "id": "frame3_title_mobile_color",
+      "label": "Mobile Title Color",
+      "default": "#000000"
     },
     {
       "type": "header",
@@ -625,7 +646,7 @@
     {
       "type": "range",
       "id": "button_font_size",
-      "label": "Button Font Size",
+      "label": "Desktop Button Font Size",
       "min": 12,
       "max": 24,
       "step": 1,
@@ -674,19 +695,50 @@
       "default": 4
     },
     {
+      "type": "range",
+      "id": "button_mobile_size",
+      "label": "Mobile Button Font Size",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "button_mobile_padding_v",
+      "label": "Mobile Button Vertical Padding",
+      "min": 8,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "button_mobile_padding_h",
+      "label": "Mobile Button Horizontal Padding",
+      "min": 15,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 20
+    },
+    {
       "type": "header",
-      "content": "📝 Bottom Text Banner"
+      "content": "💻 Desktop Bottom Text Banner"
     },
     {
       "type": "text",
-      "id": "bottom_text",
-      "label": "Bottom Text",
-      "default": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6X"
+      "id": "bottom_text_desktop",
+      "label": "Desktop Bottom Text",
+      "default": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6X",
+      "info": "This text appears on desktop only"
     },
     {
       "type": "range",
       "id": "bottom_text_size",
-      "label": "Bottom Text Font Size",
+      "label": "Desktop Bottom Text Font Size",
       "min": 10,
       "max": 20,
       "step": 1,
@@ -696,8 +748,63 @@
     {
       "type": "color",
       "id": "bottom_text_color",
-      "label": "Bottom Text Color",
+      "label": "Desktop Bottom Text Color",
       "default": "#666666"
+    },
+    {
+      "type": "select",
+      "id": "bottom_text_transform",
+      "label": "Desktop Text Transform",
+      "options": [
+        {"value": "none", "label": "None"},
+        {"value": "uppercase", "label": "Uppercase"},
+        {"value": "lowercase", "label": "Lowercase"},
+        {"value": "capitalize", "label": "Capitalize"}
+      ],
+      "default": "uppercase"
+    },
+    {
+      "type": "header",
+      "content": "📱 Mobile Bottom Text Banner"
+    },
+    {
+      "type": "text",
+      "id": "bottom_text_mobile",
+      "label": "Mobile Bottom Text",
+      "default": "ETHICALLY MADE • SIZES XXS-6X",
+      "info": "This text appears on mobile only - can be shorter than desktop"
+    },
+    {
+      "type": "range",
+      "id": "bottom_text_mobile_size",
+      "label": "Mobile Bottom Text Font Size",
+      "min": 10,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "default": 11
+    },
+    {
+      "type": "color",
+      "id": "bottom_text_mobile_color",
+      "label": "Mobile Bottom Text Color",
+      "default": "#666666"
+    },
+    {
+      "type": "select",
+      "id": "bottom_text_mobile_transform",
+      "label": "Mobile Text Transform",
+      "options": [
+        {"value": "none", "label": "None"},
+        {"value": "uppercase", "label": "Uppercase"},
+        {"value": "lowercase", "label": "Lowercase"},
+        {"value": "capitalize", "label": "Capitalize"}
+      ],
+      "default": "uppercase"
+    },
+    {
+      "type": "header",
+      "content": "⚙️ Bottom Banner Settings"
     },
     {
       "type": "color",
@@ -714,18 +821,6 @@
       "step": 5,
       "unit": "px",
       "default": 15
-    },
-    {
-      "type": "select",
-      "id": "bottom_text_transform",
-      "label": "Bottom Text Transform",
-      "options": [
-        {"value": "none", "label": "None"},
-        {"value": "uppercase", "label": "Uppercase"},
-        {"value": "lowercase", "label": "Lowercase"},
-        {"value": "capitalize", "label": "Capitalize"}
-      ],
-      "default": "uppercase"
     }
   ],
   "presets": [
